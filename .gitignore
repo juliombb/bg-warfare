@@ -1,0 +1,225 @@
+
+   
+# This file will cause git to exclude various Unity project      #
+# files/folders which shouldn't be put into source control       #
+##################################################################
+
+# Unity folders #
+#################
+Temp/
+Library/AssetImportState
+Library/AssetServerCacheV3
+Library/FailedAssetImports.txt
+Library/ScriptAssemblies
+Library/ScriptMapper
+Library/assetDatabase3
+Library/cache
+Library/expandedItems
+Library/metadata
+Library/previews
+Library/guidmapper
+Library/*
+TestScene*
+AssetBundles/
+AssetBundles/*
+Assets/StreamingAssets/EmbeddedAssetBundles/
+Assets/StreamingAssets/EmbeddedAssetBundles/**/*
+Assets/StreamingAssets/EmbeddedAssetBundles.meta
+AssetBundles/iOS/
+AssetBundles/iOS/*
+AssetBundles/Android/
+AssetBundles/Android/*
+
+# Build Folders #
+Output/iOS/*/*
+Output/Android/*/*
+Output/macOS/*/*
+Output/Windows/*/*
+
+
+# .NET files #
+##############
+.vs/
+*.sln
+*.csproj
+*.userprefs
+*.pidb
+obj
+.vscode
+Assets/Editor/VSIntegration
+VSIntegration.meta
+.idea/*
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor/JetBrains/*
+
+# Unity generated?
+##############
+*.unityproj
+Assets/Editor/PostprocessBuildPlayer
+Assets/Editor/PostprocessBuildPlayer.meta
+Assets/Vuforia/Plugins.meta
+Assets/Vuforia/Plugins/*
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Thumbs.db
+
+# Android Studio ignore #
+#########################
+# Built application files
+*.apk
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Unity generated gradle files
+.gradle/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+#Unity Exported Project
+Output/Android/UnityExport/*
+
+# Keystore files
+# Uncomment the following line if you do not want to check your keystore files in.
+#*.jks
+
+# Google Services (e.g. APIs or Firebase)
+# google-services.json
+
+# Freeline
+freeline.py
+freeline/
+freeline_project_description.json
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+CI/fastlane/report.xml
+
+# VUFORIA DEMO PACKS #
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs.meta
+Assets/Models/*
+Assets/Models.meta
+Assets/Editor/Vuforia/Emulator.meta
+Assets/Editor/Vuforia/ImageTargetTextures/*
+
+# XCode ignore #
+#########################
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+
+## OS generated files
+
+## Build generated
+build/
+DerivedData
+git_stats/
+releases/
+buildtimes.log
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcshareddata
+xcuserdata
+
+#AppCode
+.idea/
+
+## Other
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# CocoaPods
+#
+# We recommend against adding the Pods directory to your .gitignore. However
+# you should judge for yourself, the pros and cons are mentioned at:
+# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
+#
+Pods/
+
+# Carthage
+#
+# Add this line if you want to avoid checking in source code from Carthage dependencies.
+Carthage/Checkouts
+Carthage/Build
+Tools/PhoenixBundleGenerator/Carthage/Checkouts
+Tools/PhoenixBundleGenerator/Carthage/Build
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://github.com/fastlane/fastlane/blob/master/docs/Gitignore.md
+
+*.gcno
+*.gcda
+*.orig
+
+**/releases/*.zip
+**/releases/*.ipa
+
+*.sln.DotSettings.user
+*.symbols.zip
+Output/mac.app
+
+# WebView files that are too large to host on github and must be generated
+**/VuplexWebViewChromium/libcef.dll
+**/VuplexWebViewChromium/libcef.dll.meta
+**/Chromium\ Embedded\ Framework
+**/Chromium\ Embedded\ Framework.meta
+
+# Platform specifc assets
+Assets/Vuplex
+Assets/Vuplex.meta
+
+
+MemoryCaptures/*.png
+*.snap
+remote_config_data
+ServerData
+
+# Addressables
+ReferenceData/
+Assets/AddressableAssetsData/Android/
+Assets/AddressableAssetsData/Android.meta
+Assets/AddressableAssetsData/iOS/
+Assets/AddressableAssetsData/iOS.meta
+Assets/AddressableAssetsData/OSX/
+Assets/AddressableAssetsData/OSX.meta
+Assets/AddressableAssetsData/Windows/
+Assets/AddressableAssetsData/Windows.meta
+
+# Recordings from Unity Recorder
+/Recordings/
