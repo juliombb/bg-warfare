@@ -226,6 +226,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4953570177729582, guid: 08f5427fe0d15ad47a5a1bb70b6156c7, type: 3}
   m_PrefabInstance: {fileID: 1895587574}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &308751401 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95066877497174294, guid: 08f5427fe0d15ad47a5a1bb70b6156c7, type: 3}
+  m_PrefabInstance: {fileID: 1895587574}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,6 +601,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 963194225}
+  animator: {fileID: 308751401}
   speed: 0.5
   ySense: 2
   xSense: 1.5

@@ -6,6 +6,7 @@ using UnityEngine;
 public class FirstPersonController : MonoBehaviour
 {
     [SerializeField] private GameObject camera;
+    [SerializeField] private Animator animator;
     [SerializeField] private float speed = 0.5f;
     [SerializeField] private float ySense = 2f;
     [SerializeField] private float xSense = 1.5f;
@@ -14,6 +15,9 @@ public class FirstPersonController : MonoBehaviour
     private Rigidbody _rigidbody;
     private CapsuleCollider _capsule;
     private bool _cursorLocked = false;
+    private static readonly int Running = Animator.StringToHash("Running");
+    private static readonly int Walking = Animator.StringToHash("Walking");
+    private static readonly int Fire = Animator.StringToHash("Fire");
 
     private void Start()
     {
@@ -23,18 +27,69 @@ public class FirstPersonController : MonoBehaviour
 
     void FixedUpdate()
     {
+        HandleAim();
+
+        var actualSpeed = CheckSprint();
+
+        HandleMovement(actualSpeed);
+
+        HandleJump();
+
+        HandleShot();
+
+        UpdateCursor();
+    }
+
+    private void HandleShot()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            animator.SetTrigger(Fire);
+        }
+    }
+
+    private void HandleAim()
+    {
         float yRot = Input.GetAxis("Mouse X") * ySense;
         float xRot = Input.GetAxis("Mouse Y") * xSense;
-        
+
         transform.localRotation *= Quaternion.Euler(0, yRot, 0);
 
         camera.transform.localRotation = ClampRotation(
             camera.transform.localRotation * Quaternion.Euler(-xRot, 0, 0),
             new Vector3(90f, 360f)
         );
+    }
 
-        float x = Input.GetAxis("Horizontal") * speed;
-        float z = Input.GetAxis("Vertical") * speed;
+    private float CheckSprint()
+    {
+        var actualSpeed = speed;
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            actualSpeed = speed * 1.5f;
+            animator.SetBool(Running, true);
+        }
+        else
+        {
+            animator.SetBool(Running, false);
+        }
+
+        return actualSpeed;
+    }
+
+    private void HandleJump()
+    {
+        if (Grounded())
+        {
+            float jump = Input.GetAxis("Jump");
+            _rigidbody.AddForce(new Vector3(0, jump, 0) * jumpForce);
+        }
+    }
+
+    private void HandleMovement(float actualSpeed)
+    {
+        float x = Input.GetAxis("Horizontal") * actualSpeed;
+        float z = Input.GetAxis("Vertical") * actualSpeed;
 
         var position = transform.position;
         var previousPosition = position;
@@ -42,13 +97,7 @@ public class FirstPersonController : MonoBehaviour
         position.y = previousPosition.y;
         transform.position = position;
 
-        if (Grounded())
-        {
-            float jump = Input.GetAxis("Jump");
-            _rigidbody.AddForce(new Vector3(0, jump, 0) * jumpForce);
-        }
-
-        UpdateCursor();
+        animator.SetBool(Walking, Math.Abs(x) > 0.0001f || Math.Abs(z) > 0.0001f);
     }
 
     bool Grounded()
