@@ -7,6 +7,7 @@ public class FirstPersonController : MonoBehaviour
 {
     [SerializeField] private GameObject camera;
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform raycaster;
     [SerializeField] private float speed = 0.5f;
     [SerializeField] private float ySense = 2f;
     [SerializeField] private float xSense = 1.5f;
