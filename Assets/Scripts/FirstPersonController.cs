@@ -8,10 +8,12 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject camera;
     [SerializeField] private Animator animator;
     [SerializeField] private Transform raycaster;
+    [SerializeField] private GameObject[] legs;
     [SerializeField] private float speed = 0.5f;
     [SerializeField] private float ySense = 2f;
     [SerializeField] private float xSense = 1.5f;
     [SerializeField] private float jumpForce = 70f;
+    [SerializeField] private GameObject cube;
 
     private Rigidbody _rigidbody;
     private CapsuleCollider _capsule;
@@ -26,6 +28,11 @@ public class FirstPersonController : MonoBehaviour
         _capsule = GetComponent<CapsuleCollider>();
     }
 
+    private void Update()
+    {
+        HandleShot();
+    }
+
     void FixedUpdate()
     {
         HandleAim();
@@ -36,8 +43,6 @@ public class FirstPersonController : MonoBehaviour
 
         HandleJump();
 
-        HandleShot();
-
         UpdateCursor();
     }
 
@@ -46,6 +51,18 @@ public class FirstPersonController : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             animator.SetTrigger(Fire);
+            var raycasterTransform = raycaster.transform;
+            Physics.Raycast(raycasterTransform.position, raycasterTransform.forward, out var hit, 200);
+            if (hit.collider == null)
+            {
+                return;
+            }
+
+            var target = hit.collider.gameObject;
+            if (target.CompareTag("RemotePlayer"))
+            {
+                target.GetComponent<RemotePlayerController>().Die(hit.point, raycasterTransform.forward);
+            }
         }
     }
 
@@ -55,11 +72,16 @@ public class FirstPersonController : MonoBehaviour
         float xRot = Input.GetAxis("Mouse Y") * xSense;
 
         transform.localRotation *= Quaternion.Euler(0, yRot, 0);
+        var leg1Rot = legs[0].transform.rotation;
+        var leg2Rot = legs[1].transform.rotation;
 
         camera.transform.localRotation = ClampRotation(
             camera.transform.localRotation * Quaternion.Euler(-xRot, 0, 0),
             new Vector3(90f, 360f)
         );
+
+        legs[0].transform.rotation = leg1Rot;
+        legs[1].transform.rotation = leg2Rot;
     }
 
     private float CheckSprint()
