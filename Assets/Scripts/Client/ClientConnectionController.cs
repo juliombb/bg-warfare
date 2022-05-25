@@ -15,6 +15,7 @@ namespace DefaultNamespace
         private EventBasedNetListener _listener;
         private NetManager _client;
         private Dictionary<byte, IClientSystem> _handlers = new();
+        private NetPeer _server;
 
         private void OnStart()
         {
@@ -24,7 +25,7 @@ namespace DefaultNamespace
         {
             foreach (var handlers    in _handlers.Values)
             {
-                handlers   .Install(baseClient);
+                handlers.Install(baseClient);
             }
             if (_listener == null || _client == null)
             {
@@ -33,6 +34,10 @@ namespace DefaultNamespace
             }
             _client.Start();
             _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
+            _listener.PeerConnectedEvent += netPeer =>
+            {
+                _server = netPeer;
+            };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
                 var command = dataReader.GetByte();
