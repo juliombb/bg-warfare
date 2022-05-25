@@ -36,6 +36,8 @@ Output/Android/*/*
 Output/macOS/*/*
 Output/Windows/*/*
 
+build/
+
 
 # .NET files #
 ##############
