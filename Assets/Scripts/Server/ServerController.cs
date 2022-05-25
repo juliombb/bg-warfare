@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine;
@@ -9,16 +10,25 @@ namespace Server
     public class ServerController : MonoBehaviour
     {
         private EventBasedNetListener _listener;
-        private NetManager _server;
+        public NetManager Server { get; private set; }
+        private Dictionary<byte, IServerSystem> _handlers = new();
+
+        private MovementServerSystem _movementServerSystem;
+
+        private void Awake()
+        {
+            _handlers.Add((byte) ServerCommand.PositionOfPlayer, new MovementServerSystem(this));
+        }
+
         private void Start()
         {
             _listener = new EventBasedNetListener();
-            _server = new NetManager(_listener);
-            _server.Start(9050 /* port */);
+            Server = new NetManager(_listener);
+            Server.Start(9050 /* port */);
 
             _listener.ConnectionRequestEvent += request =>
             {
-                if(_server.ConnectedPeersCount < 10 /* max connections */)
+                if (Server.ConnectedPeersCount < 16 /* max connections */)
                     request.AcceptIfKey("BgWarfare");
                 else
                     request.Reject();
@@ -26,18 +36,23 @@ namespace Server
 
             _listener.PeerConnectedEvent += peer =>
             {
-                Debug.Log($"We got connection: {peer.EndPoint}"); // Show peer ip
-                NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put("Hello client!");                                // Put some string
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                Debug.Log($"We got connection: {peer.EndPoint}");
+                NetDataWriter writer = new NetDataWriter();
+                writer.Put("Hello client!");                               
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);            
             };
             
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                Debug.Log($"We got: {dataReader.GetString(100 /* max length of string */)}");
+                var key = dataReader.GetByte();
+                if (_handlers.ContainsKey(key))
+                {
+                    _handlers[key].Handle(fromPeer.Id, dataReader.GetRemainingBytes());
+                }
                 dataReader.Recycle();
+                
             };
-            
+
             Debug.Log("Started server");
 
             StartCoroutine(Polling());
@@ -45,16 +60,20 @@ namespace Server
 
         private IEnumerator Polling()
         {
-            while (_server.IsRunning)
+            while (Server.IsRunning)
             {
-                _server.PollEvents();
+                Server.PollEvents();
+                foreach (var system in _handlers.Values)
+                {
+                    system.Poll();
+                }
                 yield return new WaitForSeconds(1 / 15f);
             }
         }
 
         private void OnDestroy()
         {
-            _server.Stop();
+            Server.Stop();
         }
     }
 }

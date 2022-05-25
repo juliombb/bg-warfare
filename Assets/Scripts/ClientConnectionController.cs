@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
+using Client;
 using LiteNetLib;
+using LiteNetLib.Utils;
+using Server;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -10,9 +14,18 @@ namespace DefaultNamespace
     {
         private EventBasedNetListener _listener;
         private NetManager _client;
+        private Dictionary<byte, IClientSystem> _handlers = new();
 
-        public void OnConnect()
+        private void OnStart()
         {
+            _handlers.Add((byte)ServerCommand.PositionOfPlayers, new MovementClientSystem());
+        }
+        public void OnConnect(GameObject baseClient)
+        {
+            foreach (var handlers    in _handlers.Values)
+            {
+                handlers   .Install(baseClient);
+            }
             if (_listener == null || _client == null)
             {
                 _listener = new EventBasedNetListener();
@@ -22,7 +35,11 @@ namespace DefaultNamespace
             _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                Debug.Log($"We got: {dataReader.GetString(100 /* max length of string */)}");
+                var command = dataReader.GetByte();
+                if (_handlers.ContainsKey(command))
+                {
+                    _handlers[command].Handle(dataReader.GetRemainingBytes());
+                }
                 dataReader.Recycle();
             };
 
