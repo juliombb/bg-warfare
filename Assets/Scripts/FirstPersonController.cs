@@ -12,7 +12,7 @@ public class FirstPersonController : MonoBehaviour
     private float speed = 0.5f;
     private float ySense = 2f;
     private float xSense = 1.5f;
-    private float jumpForce = 70f;
+    private float jumpForce = 200f;
     private float fireRate = 0.134f;
 
     private Camera _camera;
@@ -135,7 +135,7 @@ public class FirstPersonController : MonoBehaviour
     bool Grounded()
     {
         return Physics.SphereCast(
-            transform.position, _capsule.radius, Vector3.down, out _,
+            transform.position + _capsule.center, _capsule.radius, Vector3.down, out _,
             (_capsule.height / 2f) - _capsule.radius + 0.1f);
     }
 
