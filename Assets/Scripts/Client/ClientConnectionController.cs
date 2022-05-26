@@ -34,6 +34,7 @@ namespace DefaultNamespace
             _listener.PeerConnectedEvent += netPeer =>
             {
                 var server = new ServerData(netPeer, clientPeer.Id);
+                Debug.Log($"Connected! I am peer {clientPeer.Id}");
                 SetupServer(baseClient, server);
             };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
