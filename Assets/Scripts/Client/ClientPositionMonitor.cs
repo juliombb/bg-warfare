@@ -2,6 +2,7 @@ using System;
 using DefaultNamespace;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Server;
 using UnityEngine;
 
 namespace Client
@@ -24,7 +25,7 @@ namespace Client
             _writer.Reset();
             var position = _monitoredTransform.position;
             var rotation = _monitoredTransform.rotation;
-                
+            _writer.Put((byte)ServerCommand.PositionOfPlayer);
             _writer.Put(BitConverter.GetBytes(sequence++), 0 , 4);
             _writer.Put(BitConverter.GetBytes(position.x), 0 , 4);
             _writer.Put(BitConverter.GetBytes(position.y), 0 , 4);

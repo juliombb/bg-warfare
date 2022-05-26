@@ -22,7 +22,7 @@ namespace Client
             using var stream = new BinaryReader(new MemoryStream(data));
             while (stream.HasNext())
             {
-                var player = BitConverter.ToInt32(stream.ReadBytes(4));
+                var player = stream.ReadInt32();
                 var snapshot = new PlayerSnapshot(
                     sequence: stream.ReadInt32(),
                     position: new Vector3(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle()),

@@ -25,7 +25,7 @@ namespace Server
 
         public void Poll()
         {
-            var stream = new MemoryStream(_lastKnownPositions.Count * 30);
+            var stream = new MemoryStream(_lastKnownPositions.Count * 20);
             foreach (var lastKnownPosition in _lastKnownPositions)
             {
                 stream.Write(BitConverter.GetBytes(lastKnownPosition.Key));
