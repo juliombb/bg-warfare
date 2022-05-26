@@ -10,6 +10,7 @@ namespace Server
     {
         private readonly ServerController _serverController;
         private readonly Dictionary<int, byte[]> _lastKnownPositions = new();
+        private readonly HashSet<int> _playersToSend = new();
 
         public MovementServerSystem(ServerController serverController)
         {
@@ -21,16 +22,19 @@ namespace Server
         public void Handle(int playerId, byte[] data)
         {
             _lastKnownPositions[playerId] = data;
+            _playersToSend.Add(playerId);
         }
 
         public void Poll()
         {
-            var stream = new MemoryStream(_lastKnownPositions.Count * 20);
-            foreach (var lastKnownPosition in _lastKnownPositions)
+            var stream = new MemoryStream(_playersToSend.Count * 20);
+            foreach (var playerToSend in _playersToSend)
             {
-                stream.Write(BitConverter.GetBytes(lastKnownPosition.Key));
-                stream.Write(lastKnownPosition.Value);
+                var lastKnownPosition = _lastKnownPositions[playerToSend];
+                stream.Write(BitConverter.GetBytes(playerToSend));
+                stream.Write(lastKnownPosition);
             }
+            _playersToSend.Clear();
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte) ServerCommand.PositionOfPlayers);
