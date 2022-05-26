@@ -1,3 +1,4 @@
+using LiteNetLib;
 using Server;
 using UnityEngine;
 
@@ -8,6 +9,6 @@ namespace Client
         public ServerCommand CommandKey { get; }
 
         void Handle(byte[] data);
-        void Install(GameObject baseClient);
+        void Install(GameObject baseClient, NetPeer server);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using DefaultNamespace;
+using LiteNetLib;
 using Server;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace Client
         private RemotePlayersController _remotePlayersController;
         ServerCommand IClientSystem.CommandKey => ServerCommand.PositionOfPlayers;
 
-        void IClientSystem.Install(GameObject baseClient)
+        void IClientSystem.Install(GameObject baseClient, NetPeer server)
         {
             _remotePlayersController = baseClient.GetComponentInChildren<RemotePlayersController>();
         }

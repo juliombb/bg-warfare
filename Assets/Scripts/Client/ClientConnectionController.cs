@@ -6,6 +6,7 @@ using Client;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Server;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -15,18 +16,14 @@ namespace DefaultNamespace
         private EventBasedNetListener _listener;
         private NetManager _client;
         private Dictionary<byte, IClientSystem> _handlers = new();
-        private NetPeer _server;
 
-        private void OnStart()
+        private void AddSystem(IClientSystem system)
         {
-            _handlers.Add((byte)ServerCommand.PositionOfPlayers, new MovementClientSystem());
+            _handlers.Add((byte)system.CommandKey, system);
         }
+
         public void OnConnect(GameObject baseClient)
         {
-            foreach (var handlers    in _handlers.Values)
-            {
-                handlers.Install(baseClient);
-            }
             if (_listener == null || _client == null)
             {
                 _listener = new EventBasedNetListener();
@@ -36,7 +33,7 @@ namespace DefaultNamespace
             _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
             _listener.PeerConnectedEvent += netPeer =>
             {
-                _server = netPeer;
+                SetupServer(baseClient, netPeer);
             };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
@@ -49,6 +46,18 @@ namespace DefaultNamespace
             };
 
             StartCoroutine(Polling());
+        }
+
+        private void SetupServer(GameObject baseClient, NetPeer server)
+        {
+            _handlers.Clear();
+            gameObject.GetOrAddComponent<ClientPositionMonitor>().Setup(baseClient, server);
+
+            AddSystem(new MovementClientSystem());
+            foreach (var handlers in _handlers.Values)
+            {
+                handlers.Install(baseClient, server);
+            }
         }
 
         private IEnumerator Polling()
