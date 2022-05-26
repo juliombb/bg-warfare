@@ -18,7 +18,7 @@ public class RemotePlayerController : MonoBehaviour
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        _animator = defaultModel.GetComponent<Animator>();
     }
 
     public void OnNewSnapshot(PlayerSnapshot snapshot)
