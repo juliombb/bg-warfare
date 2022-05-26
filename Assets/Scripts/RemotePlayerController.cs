@@ -16,6 +16,7 @@ public class RemotePlayerController : MonoBehaviour
     private Animator _animator;
     private static readonly int Walking = Animator.StringToHash("Walking");
     private int _animationCooldown = 0;
+    private float? timeToStart;
 
     private void Start()
     {
@@ -36,6 +37,7 @@ public class RemotePlayerController : MonoBehaviour
     {
         if (_snapshotQueue.Count <= 0)
         {
+            _previous = null;
             if (_animationCooldown++ > 15)
             {
                 _animator.SetBool(Walking, false);
@@ -46,6 +48,13 @@ public class RemotePlayerController : MonoBehaviour
         var currentSnapshot = _snapshotQueue.Peek();
         if (_previous == null)
         {
+            if (timeToStart == null)
+            {
+                timeToStart = Time.time + Config.RemoteLagSecs;
+            } else if (timeToStart > Time.time) 
+            {
+                return;
+            }
             transform.position = currentSnapshot.Position;
             transform.rotation = currentSnapshot.Rotation;
             _next = currentSnapshot;
@@ -71,7 +80,11 @@ public class RemotePlayerController : MonoBehaviour
         );
 
         _lastInterpolation = time;
-        _animator.SetBool(Walking, true);
+        if (Vector3.Distance(_previous.Position, _next.Position) > Vector3.kEpsilon)
+        {
+            _animator.SetBool(Walking, true);
+        }
+
         _animationCooldown = 0;
     }
 
