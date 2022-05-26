@@ -9,6 +9,6 @@ namespace Client
         public ServerCommand CommandKey { get; }
 
         void Handle(byte[] data);
-        void Install(GameObject baseClient, NetPeer server);
+        void Install(GameObject baseClient, ServerData server);
     }
 }

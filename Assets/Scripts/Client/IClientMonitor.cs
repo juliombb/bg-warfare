@@ -5,6 +5,6 @@ namespace Client
 {
     public interface IClientMonitor
     {
-        public void Setup(GameObject baseClient, NetPeer server);
+        public void Setup(GameObject baseClient, ServerData server);
     }
 }

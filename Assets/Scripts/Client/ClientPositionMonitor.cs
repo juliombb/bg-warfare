@@ -14,9 +14,9 @@ namespace Client
         private Transform _monitoredTransform;
         private NetDataWriter _writer = new NetDataWriter();
         private int sequence = 0;
-        public void Setup(GameObject baseClient, NetPeer server)
+        public void Setup(GameObject baseClient, ServerData server)
         {
-            _server = server;
+            _server = server.Peer;
             _monitoredTransform = baseClient.transform.Find("FPC");
         }
         private void Update()

@@ -30,10 +30,11 @@ namespace DefaultNamespace
                 _client = new NetManager(_listener);
             }
             _client.Start();
-            _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
+            var clientPeer = _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
             _listener.PeerConnectedEvent += netPeer =>
             {
-                SetupServer(baseClient, netPeer);
+                var server = new ServerData(netPeer, clientPeer.Id);
+                SetupServer(baseClient, server);
             };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
@@ -48,7 +49,7 @@ namespace DefaultNamespace
             StartCoroutine(Polling());
         }
 
-        private void SetupServer(GameObject baseClient, NetPeer server)
+        private void SetupServer(GameObject baseClient, ServerData server)
         {
             _handlers.Clear();
             gameObject.GetOrAddComponent<ClientPositionMonitor>().Setup(baseClient, server);
