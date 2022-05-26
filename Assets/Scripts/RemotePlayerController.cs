@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
@@ -12,6 +13,13 @@ public class RemotePlayerController : MonoBehaviour
     private PlayerSnapshot _previous;
     private PlayerSnapshot _next;
     private float _lastInterpolation;
+    private Animator _animator;
+    private static readonly int Walking = Animator.StringToHash("Walking");
+
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
+    }
 
     public void OnNewSnapshot(PlayerSnapshot snapshot)
     {
@@ -27,6 +35,7 @@ public class RemotePlayerController : MonoBehaviour
     {
         if (_snapshotQueue.Count <= 0)
         {
+            _animator.SetBool(Walking, false);
             return;
         }
 
@@ -58,6 +67,7 @@ public class RemotePlayerController : MonoBehaviour
         );
 
         _lastInterpolation = time;
+        _animator.SetBool(Walking, true);
     }
 
     public bool Moving()
