@@ -696,7 +696,6 @@ MonoBehaviour:
   cameraGo: {fileID: 963194225}
   animator: {fileID: 95066877241571296}
   raycaster: {fileID: 836955258}
-  character: {fileID: 8260339849564428078}
   cube: {fileID: 5741508081456701927, guid: ee478e53e833b4ef392d53b5fdcdaaee, type: 3}
 --- !u!1 &1819186509
 GameObject:
@@ -999,8 +998,3 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08f5427fe0d15ad47a5a1bb70b6156c7, type: 3}
---- !u!1 &8260339849564428078 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8259926853513862631, guid: 08f5427fe0d15ad47a5a1bb70b6156c7, type: 3}
-  m_PrefabInstance: {fileID: 8260339849564428077}
-  m_PrefabAsset: {fileID: 0}
