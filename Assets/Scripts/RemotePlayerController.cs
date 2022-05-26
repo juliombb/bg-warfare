@@ -55,8 +55,6 @@ public class RemotePlayerController : MonoBehaviour
                 return;
             }
             var currentSnapshot = _snapshotQueue.Dequeue();
-            transform.position = currentSnapshot.Position;
-            transform.rotation = currentSnapshot.Rotation;
             _previous = _next = currentSnapshot;
             Debug.Log("Started interpolation");
             return;
