@@ -14,5 +14,10 @@ namespace DefaultNamespace
             Rotation = rotation;
             Sequence = sequence;
         }
+
+        public override string ToString()
+        {
+            return $"s{Sequence} {Position.ToString()}";
+        }
     }
 }

@@ -12,7 +12,7 @@ public class RemotePlayerController : MonoBehaviour
     private Queue<PlayerSnapshot> _snapshotQueue = new Queue<PlayerSnapshot>();
     private PlayerSnapshot _previous;
     private PlayerSnapshot _next;
-    private float _lastInterpolation;
+    private float _lastInterpolation = 0f;
     private Animator _animator;
     private static readonly int Walking = Animator.StringToHash("Walking");
     private int _animationCooldown = 0;
@@ -44,33 +44,39 @@ public class RemotePlayerController : MonoBehaviour
             }
             return;
         }
+        
+        float time = Time.time;
 
         var currentSnapshot = _snapshotQueue.Peek();
         if (_previous == null)
         {
             if (timeToStart == null)
             {
-                timeToStart = Time.time + Config.RemoteLagSecs;
-            } else if (timeToStart > Time.time) 
+                timeToStart = time + Config.RemoteLagSecs;
+                return;
+            }
+            if (timeToStart > time) 
             {
                 return;
             }
             transform.position = currentSnapshot.Position;
             transform.rotation = currentSnapshot.Rotation;
-            _next = currentSnapshot;
+            _previous = _next = currentSnapshot;
             _snapshotQueue.Dequeue();
+            Debug.Log("Started interpolation");
             return;
         }
 
-        float time = Time.time;
         if (time - _lastInterpolation >= Config.TickRate * (_next.Sequence - _previous.Sequence))
         {
             _previous = _next;
             _next = currentSnapshot;
             _snapshotQueue.Dequeue();
+            _lastInterpolation = time;
+            Debug.Log($"New snapshot: {_previous} {_next}");
         }
 
-        float duration = (_previous.Sequence - _next.Sequence) * Config.TickRate;
+        float duration = (_next.Sequence - _previous.Sequence) * Config.TickRate;
         float elapsedTime = time - _lastInterpolation;
         transform.position = Vector3.Lerp(_previous.Position, _next.Position, elapsedTime / duration);
         transform.rotation = Quaternion.Slerp(
@@ -79,7 +85,6 @@ public class RemotePlayerController : MonoBehaviour
             elapsedTime / duration
         );
 
-        _lastInterpolation = time;
         if (Vector3.Distance(_previous.Position, _next.Position) > Vector3.kEpsilon)
         {
             _animator.SetBool(Walking, true);
