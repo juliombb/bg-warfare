@@ -38,10 +38,6 @@ public class RemotePlayerController : MonoBehaviour
         if (_snapshotQueue.Count <= 0)
         {
             _previous = null;
-            if (_animationCooldown++ > 5)
-            {
-                _animator.SetBool(Walking, false);
-            }
             return;
         }
         
@@ -75,7 +71,20 @@ public class RemotePlayerController : MonoBehaviour
             _lastInterpolation = time;
             Debug.Log($"New snapshot: {_previous} {_next}");
         }
+    }
 
+    private void Update()
+    {
+        if (_snapshotQueue.Count <= 0)
+        {
+            if (_animationCooldown++ > 5)
+            {
+                _animator.SetBool(Walking, false);
+            }
+            return;
+        }
+
+        var time = Time.time;
         float duration = (_next.Sequence - _previous.Sequence) * Config.TickRate;
         float elapsedTime = time - _lastInterpolation;
         transform.position = Vector3.Lerp(_previous.Position, _next.Position, elapsedTime / duration);
@@ -85,10 +94,7 @@ public class RemotePlayerController : MonoBehaviour
             elapsedTime / duration
         );
 
-        if (Vector3.Distance(_previous.Position, _next.Position) > Vector3.kEpsilon)
-        {
-            _animator.SetBool(Walking, true);
-        }
+        _animator.SetBool(Walking, true);
 
         _animationCooldown = 0;
     }

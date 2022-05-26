@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace Server
                 {
                     system.Poll();
                 }
-                yield return new WaitForSeconds(1 / 15f);
+                yield return new WaitForSeconds(Config.TickRate);
             }
         }
 
