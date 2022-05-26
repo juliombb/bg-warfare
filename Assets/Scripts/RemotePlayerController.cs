@@ -33,12 +33,12 @@ public class RemotePlayerController : MonoBehaviour
         _snapshotQueue.Enqueue(snapshot);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (_snapshotQueue.Count <= 0)
         {
             _previous = null;
-            if (_animationCooldown++ > 15)
+            if (_animationCooldown++ > 5)
             {
                 _animator.SetBool(Walking, false);
             }

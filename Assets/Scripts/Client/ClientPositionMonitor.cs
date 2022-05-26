@@ -22,7 +22,7 @@ namespace Client
             _server = server.Peer;
             _monitoredTransform = baseClient.transform.Find("FPC");
         }
-        private void Update()
+        private void FixedUpdate()
         {
             if (Time.time - _lastUpdate < Config.TickRate) return;
             _writer.Reset();
