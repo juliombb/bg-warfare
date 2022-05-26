@@ -16,7 +16,7 @@ public class RemotePlayerController : MonoBehaviour
     private Animator _animator;
     private static readonly int Walking = Animator.StringToHash("Walking");
     private int _animationCooldown = 0;
-    private float? timeToStart;
+    private float? _timeToStart = null;
 
     private void Start()
     {
@@ -37,7 +37,15 @@ public class RemotePlayerController : MonoBehaviour
     {
         if (_snapshotQueue.Count <= 0)
         {
-            _previous = null;
+            if (
+                _previous != null
+                && Time.time - _lastInterpolation >= Config.TickRate * (_next.Sequence - _previous.Sequence)
+            )
+            {
+                _previous = null;
+                _timeToStart = null;
+            }
+
             return;
         }
         
@@ -45,12 +53,12 @@ public class RemotePlayerController : MonoBehaviour
 
         if (_previous == null)
         {
-            if (timeToStart == null)
+            if (_timeToStart == null)
             {
-                timeToStart = time + Config.RemoteLagSecs;
+                _timeToStart = time + Config.RemoteLagSecs;
                 return;
             }
-            if (timeToStart > time) 
+            if (_timeToStart > time) 
             {
                 return;
             }
@@ -71,7 +79,7 @@ public class RemotePlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (_snapshotQueue.Count <= 0 || _previous == null)
+        if (_previous == null)
         {
             if (_animationCooldown++ > 5)
             {
@@ -83,6 +91,10 @@ public class RemotePlayerController : MonoBehaviour
         var time = Time.time;
         float duration = (_next.Sequence - _previous.Sequence) * Config.TickRate;
         float elapsedTime = time - _lastInterpolation;
+        if (elapsedTime > duration)
+        {
+            return;
+        }
         transform.position = Vector3.Lerp(_previous.Position, _next.Position, elapsedTime / duration);
         transform.rotation = Quaternion.Slerp(
             _previous.Rotation, 
