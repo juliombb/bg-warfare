@@ -73,7 +73,7 @@ public class RemotePlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (_snapshotQueue.Count <= 0)
+        if (_snapshotQueue.Count <= 0 || _previous == null)
         {
             if (_animationCooldown++ > 5)
             {
