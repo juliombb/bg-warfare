@@ -43,7 +43,6 @@ public class RemotePlayerController : MonoBehaviour
         
         float time = Time.time;
 
-        var currentSnapshot = _snapshotQueue.Peek();
         if (_previous == null)
         {
             if (timeToStart == null)
@@ -55,10 +54,10 @@ public class RemotePlayerController : MonoBehaviour
             {
                 return;
             }
+            var currentSnapshot = _snapshotQueue.Dequeue();
             transform.position = currentSnapshot.Position;
             transform.rotation = currentSnapshot.Rotation;
             _previous = _next = currentSnapshot;
-            _snapshotQueue.Dequeue();
             Debug.Log("Started interpolation");
             return;
         }
@@ -66,8 +65,7 @@ public class RemotePlayerController : MonoBehaviour
         if (time - _lastInterpolation >= Config.TickRate * (_next.Sequence - _previous.Sequence))
         {
             _previous = _next;
-            _next = currentSnapshot;
-            _snapshotQueue.Dequeue();
+            _next = _snapshotQueue.Dequeue();
             _lastInterpolation = time;
             Debug.Log($"New snapshot: {_previous} {_next}");
         }
