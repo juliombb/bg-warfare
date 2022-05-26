@@ -20,7 +20,7 @@ namespace Client
         public void Setup(GameObject baseClient, ServerData server)
         {
             _server = server.Peer;
-            _monitoredTransform = baseClient.transform.Find("FPC");
+            _monitoredTransform = baseClient.GetComponentInChildren<FirstPersonController>().Character.transform;
         }
         private void FixedUpdate()
         {
