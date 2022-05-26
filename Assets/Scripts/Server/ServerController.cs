@@ -38,8 +38,9 @@ namespace Server
             {
                 Debug.Log($"We got connection: {peer.EndPoint}");
                 NetDataWriter writer = new NetDataWriter();
-                writer.Put("Hello client!");                               
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);            
+                writer.Put((byte)ServerCommand.ClientPeerId);
+                writer.Put(peer.Id);
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);
             };
             
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>

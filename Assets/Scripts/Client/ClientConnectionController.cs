@@ -16,6 +16,8 @@ namespace DefaultNamespace
         private EventBasedNetListener _listener;
         private NetManager _client;
         private Dictionary<byte, IClientSystem> _handlers = new();
+        private NetPeer _server;
+        private int _clientPeerId = -1;
 
         private void AddSystem(IClientSystem system)
         {
@@ -30,16 +32,24 @@ namespace DefaultNamespace
                 _client = new NetManager(_listener);
             }
             _client.Start();
-            var clientPeer = _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
+            _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
             _listener.PeerConnectedEvent += netPeer =>
             {
-                var server = new ServerData(netPeer, clientPeer.Id);
-                Debug.Log($"Connected! I am peer {clientPeer.Id}");
-                SetupServer(baseClient, server);
+                _server = netPeer;
             };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
+                if (_server.Id != fromPeer.Id) return;
                 var command = dataReader.GetByte();
+                if (command == (byte)ServerCommand.ClientPeerId && _clientPeerId == -1)
+                {
+                    _clientPeerId = dataReader.GetInt();
+                    var server = new ServerData(_server, _clientPeerId);
+                    Debug.Log($"Connected! I am peer {_clientPeerId}");
+                    SetupServer(baseClient, server);
+                }
+
+                if (_clientPeerId == -1) return;
                 if (_handlers.ContainsKey(command))
                 {
                     _handlers[command].Handle(dataReader.GetRemainingBytes());
