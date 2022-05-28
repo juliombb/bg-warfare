@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 
 public class FirstPersonController : MonoBehaviour
@@ -8,7 +9,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject cameraGo;
     [SerializeField] private Animator animator;
     [SerializeField] private Transform raycaster;
-    [SerializeField] private GameObject cube;
+    [SerializeField] private GameObject capsule;
     private event Action<Vector3, Vector3, int> shotListener;
     private float speed = 0.25f;
     private float ySense = 2f;
@@ -65,9 +66,14 @@ public class FirstPersonController : MonoBehaviour
         UpdateCursor();
     }
 
+    public void RenderCapsule(Vector3 position)
+    {
+        Instantiate(capsule, position, Quaternion.identity);
+    }
+
     private void OnShotEntered() {
         var mouseRay = _camera.ScreenPointToRay(Input.mousePosition);
-        Physics.Raycast(mouseRay.origin, mouseRay.direction, out var hit, 200);
+        Physics.Raycast(mouseRay.origin, mouseRay.direction, out var hit, Config.MaxShotDistance);
 
         if (hit.collider == null)
         {
@@ -75,7 +81,7 @@ public class FirstPersonController : MonoBehaviour
             return;
         }
 
-        //Instantiate(cube, hit.point, Quaternion.identity);
+        //RenderCapsule(hit.point)
 
         var target = hit.collider.gameObject;
         if (target.CompareTag("RemotePlayer"))

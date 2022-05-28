@@ -9,6 +9,16 @@ public class RemotePlayersController : MonoBehaviour
     
     private readonly Dictionary<int, RemotePlayerController> _connectedPlayers = new();
 
+    public RemotePlayerController GetRemotePlayer(int playerId)
+    {
+        if (_connectedPlayers.ContainsKey(playerId))
+        {
+            return _connectedPlayers[playerId];
+        }
+
+        return null;
+    }
+
     public void OnPlayerEnter(int userId)
     {
         if (_connectedPlayers.ContainsKey(userId)) return;

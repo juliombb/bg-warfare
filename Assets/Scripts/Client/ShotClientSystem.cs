@@ -37,11 +37,15 @@ namespace Client
             if (shot.Target == _clientPeerId)
             {
                 _firstPersonController.TakeShot();
+                return;
             }
-            else
+
+            if (fromPlayer == _clientPeerId)
             {
-                _remotePlayersController.TakeShot(shot.Target, shot.Position, shot.Direction);
+                _firstPersonController.RenderCapsule(shot.Position);
             }
+            _remotePlayersController.TakeShot(shot.Target, shot.Position, shot.Direction);
+            
         }
         
     }

@@ -32,7 +32,7 @@ public class RemotePlayerController : MonoBehaviour
         }
     }
 
-    private void StartCheck(float time)
+    public void StartCheck(float time)
     {
         _checking = true;
         PlayerSnapshot lastSnapshot = null;
@@ -68,7 +68,7 @@ public class RemotePlayerController : MonoBehaviour
         transform.position = Vector3.Lerp(_previous.Position, _next.Position, smoothStep);
     }
 
-    private void FinishCheck()
+    public void FinishCheck()
     {
         _checking = false;
     }
