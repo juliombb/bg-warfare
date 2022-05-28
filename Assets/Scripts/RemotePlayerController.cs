@@ -64,7 +64,7 @@ public class RemotePlayerController : MonoBehaviour
             }
             var currentSnapshot = _snapshotQueue.Dequeue();
             _previous = _next = currentSnapshot;
-            Debug.Log("Started interpolation");
+            // Debug.Log("Started interpolation");
             return;
         }
 
@@ -73,7 +73,7 @@ public class RemotePlayerController : MonoBehaviour
             _previous = _next;
             _next = _snapshotQueue.Dequeue();
             _lastInterpolation = time;
-            Debug.Log($"New snapshot: {_previous} {_next}");
+            // Debug.Log($"New snapshot: {_previous} {_next}");
         }
     }
 
@@ -95,7 +95,9 @@ public class RemotePlayerController : MonoBehaviour
         {
             return;
         }
-        transform.position = Vector3.Lerp(_previous.Position, _next.Position, elapsedTime / duration);
+
+        var smoothStep = Mathf.SmoothStep(0.0f, 1.0f, elapsedTime / duration);
+        transform.position = Vector3.Lerp(_previous.Position, _next.Position, smoothStep);
         transform.rotation = Quaternion.Slerp(
             _previous.Rotation, 
             _next.Rotation,
