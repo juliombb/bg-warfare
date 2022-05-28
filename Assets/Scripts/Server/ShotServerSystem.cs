@@ -26,9 +26,9 @@ namespace Server
         {
             using var reader = new BinaryReader(new MemoryStream(data));
             var shot = reader.ReadShotSnapshot();
+            Debug.Log($"received shot with target {shot.Target}");
             if (shot.Target > 0)
             {
-                Debug.Log($"received shot with target {shot.Target}");
                 shot = ValidateShot(clientTime: reader.ReadInt64(), shot: shot);
                 Debug.Log($"validated target is {shot.Target}");
             }
