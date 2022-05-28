@@ -26,7 +26,7 @@ public class RemotePlayerController : MonoBehaviour
 
     public void SetupId(int id)
     {
-        if (_id != -1)
+        if (_id == -1)
         {
             _id = id;
         }
