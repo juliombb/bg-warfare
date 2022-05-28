@@ -9,7 +9,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private Transform raycaster;
     [SerializeField] private GameObject cube;
-    private float speed = 0.5f;
+    private float speed = 0.25f;
     private float ySense = 2f;
     private float xSense = 1.5f;
     private float jumpForce = 200f;
@@ -89,7 +89,7 @@ public class FirstPersonController : MonoBehaviour
 
         cameraGo.transform.localRotation = ClampRotation(
             cameraGo.transform.localRotation * Quaternion.Euler(-xRot, 0, 0),
-            new Vector3(90f, 360f)
+            new Vector3(45f, 360f)
         );
     }
 
