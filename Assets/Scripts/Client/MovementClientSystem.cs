@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using DefaultNamespace;
+using DefaultNamespace.Serialization;
 using LiteNetLib;
 using Server;
 using UnityEngine;
@@ -26,11 +27,7 @@ namespace Client
             while (stream.HasNext())
             {
                 var player = stream.ReadInt32();
-                var snapshot = new PlayerSnapshot(
-                    sequence: stream.ReadInt32(),
-                    position: new Vector3(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle()),
-                    rotation: Quaternion.Euler(0, stream.ReadSingle(), 0)
-                );
+                var snapshot = stream.ReadPlayerSnapshot();
                 if (_clientPeerId == player)
                 {
                     continue;

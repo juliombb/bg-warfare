@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using DefaultNamespace;
+using DefaultNamespace.Serialization;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -9,8 +11,9 @@ namespace Server
     public class MovementServerSystem: IServerSystem
     {
         private readonly ServerController _serverController;
-        private readonly Dictionary<int, byte[]> _lastKnownPositions = new();
+        private readonly Dictionary<int, PlayerSnapshot> _lastKnownPositions = new();
         private readonly HashSet<int> _playersToSend = new();
+        private readonly NetDataWriter _writer = new NetDataWriter();
 
         public MovementServerSystem(ServerController serverController)
         {
@@ -21,27 +24,26 @@ namespace Server
 
         public void Handle(int playerId, byte[] data)
         {
-            _lastKnownPositions[playerId] = data;
+            using var reader = new BinaryReader(new MemoryStream(data));
+            _lastKnownPositions[playerId] = reader.ReadPlayerSnapshot();
             _playersToSend.Add(playerId);
         }
 
         public void Poll()
         {
-            var stream = new MemoryStream(_playersToSend.Count * 20);
+            _writer.Reset();
+            _writer.Put((byte) ServerCommand.PositionOfPlayers);
             foreach (var playerToSend in _playersToSend)
             {
                 var lastKnownPosition = _lastKnownPositions[playerToSend];
-                stream.Write(BitConverter.GetBytes(playerToSend));
-                stream.Write(lastKnownPosition);
+                _writer.Put(BitConverter.GetBytes(playerToSend));
+                _writer.PutPlayerSnapshot(lastKnownPosition);
             }
             _playersToSend.Clear();
 
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((byte) ServerCommand.PositionOfPlayers);
-            writer.Put(stream.ToArray());
             foreach (var netPeer in _serverController.Server.ConnectedPeerList)
             {
-                netPeer.Send(writer, DeliveryMethod.Unreliable);
+                netPeer.Send(_writer, DeliveryMethod.Unreliable);
             }
         }
     }
