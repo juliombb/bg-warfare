@@ -13,7 +13,7 @@ namespace DefaultNamespace.Serialization
             writer.Put(BitConverter.GetBytes(snapshot.Position.x), 0 , 4);
             writer.Put(BitConverter.GetBytes(snapshot.Position.y), 0 , 4);
             writer.Put(BitConverter.GetBytes(snapshot.Position.z), 0 , 4);
-            writer.Put(BitConverter.GetBytes(snapshot.Rotation.y), 0 , 4);
+            writer.Put(BitConverter.GetBytes(snapshot.Rotation.eulerAngles.y), 0 , 4);
         }
 
         public static PlayerSnapshot ReadPlayerSnapshot(this BinaryReader stream)

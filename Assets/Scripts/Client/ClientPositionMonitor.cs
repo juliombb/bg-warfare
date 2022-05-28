@@ -1,5 +1,6 @@
 using System;
 using DefaultNamespace;
+using DefaultNamespace.Serialization;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Server;
@@ -27,19 +28,16 @@ namespace Client
             if (Time.time - _lastUpdate < Config.TickRate) return;
             _writer.Reset();
             var position = _monitoredTransform.position;
-            var rotation = _monitoredTransform.rotation.eulerAngles;
-            if (Vector3.Distance(position, _lastPosition) < _epsilon && Vector3.Distance(rotation, _lastRotation) < _epsilon)
+            var rotation = _monitoredTransform.rotation;
+            if (Vector3.Distance(position, _lastPosition) < _epsilon 
+                && Vector3.Distance(rotation.eulerAngles, _lastRotation) < _epsilon)
             {
                 return;
             }
             _lastPosition = position;
-            _lastRotation = rotation;
+            _lastRotation = rotation.eulerAngles;
             _writer.Put((byte)ServerCommand.PositionOfPlayer);
-            _writer.Put(BitConverter.GetBytes(_sequence++), 0 , 4);
-            _writer.Put(BitConverter.GetBytes(position.x), 0 , 4);
-            _writer.Put(BitConverter.GetBytes(position.y), 0 , 4);
-            _writer.Put(BitConverter.GetBytes(position.z), 0 , 4);
-            _writer.Put(BitConverter.GetBytes(rotation.y), 0 , 4);
+            _writer.PutPlayerSnapshot(new PlayerSnapshot(_sequence++, position, rotation));
             _server.Send(_writer, DeliveryMethod.Unreliable);
             _lastUpdate = Time.time;
         }
