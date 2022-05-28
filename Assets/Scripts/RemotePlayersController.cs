@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DefaultNamespace;
+using Model;
 using UnityEngine;
 
 public class RemotePlayersController : MonoBehaviour
@@ -13,6 +14,7 @@ public class RemotePlayersController : MonoBehaviour
         if (_connectedPlayers.ContainsKey(userId)) return;
         var remotePlayer = Instantiate(_remotePlayerPrefab);
         var remoteController = remotePlayer.GetComponent<RemotePlayerController>();
+        remoteController.SetupId(userId);
         _connectedPlayers[userId] = remoteController;
     }
 
@@ -32,5 +34,23 @@ public class RemotePlayersController : MonoBehaviour
             OnPlayerEnter(player);
         }
         _connectedPlayers[player].OnNewSnapshot(snapshot);
+    }
+    
+    public void OnShot(int player)
+    {
+        if (!_connectedPlayers.ContainsKey(player))
+        {
+            return;
+        }
+        _connectedPlayers[player].OnShot();
+    }
+    
+    public void TakeShot(int player, Vector3 position, Vector3 direction)
+    {
+        if (!_connectedPlayers.ContainsKey(player))
+        {
+            return;
+        }
+        _connectedPlayers[player].Die(position, direction); // todo take shot
     }
 }

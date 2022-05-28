@@ -1,8 +1,9 @@
 using System;
 using DefaultNamespace;
-using DefaultNamespace.Serialization;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Model;
+using Serialization;
 using Server;
 using UnityEngine;
 
@@ -37,7 +38,7 @@ namespace Client
             _lastPosition = position;
             _lastRotation = rotation.eulerAngles;
             _writer.Put((byte)ServerCommand.PositionOfPlayer);
-            _writer.PutPlayerSnapshot(new PlayerSnapshot(_sequence++, position, rotation));
+            PlayerSnapshotSerializer.PutPlayerSnapshot(_writer, new PlayerSnapshot(_sequence++, position, rotation));
             _server.Send(_writer, DeliveryMethod.Unreliable);
             _lastUpdate = Time.time;
         }

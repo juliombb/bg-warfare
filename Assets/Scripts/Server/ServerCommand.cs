@@ -4,6 +4,7 @@ namespace Server
     {
         PositionOfPlayer,
         PositionOfPlayers,
-        ClientPeerId
+        ClientPeerId,
+        Shot
     }
 }

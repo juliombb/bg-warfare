@@ -10,19 +10,17 @@ namespace Server
 {
     public class ServerController : MonoBehaviour
     {
+        [SerializeField] private GameObject baseGame;
         private EventBasedNetListener _listener;
         public NetManager Server { get; private set; }
         private Dictionary<byte, IServerSystem> _handlers = new();
 
         private MovementServerSystem _movementServerSystem;
 
-        private void Awake()
-        {
-            _handlers.Add((byte) ServerCommand.PositionOfPlayer, new MovementServerSystem(this));
-        }
-
         private void Start()
         {
+            _handlers.Add((byte) ServerCommand.PositionOfPlayer, new MovementServerSystem(this, baseGame));
+            _handlers.Add((byte) ServerCommand.Shot, new ShotServerSystem(this, baseGame));
             _listener = new EventBasedNetListener();
             Server = new NetManager(_listener);
             Server.Start(9050 /* port */);
@@ -42,6 +40,10 @@ namespace Server
                 writer.Put((byte)ServerCommand.ClientPeerId);
                 writer.Put(peer.Id);
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                foreach (var system in _handlers.Values)
+                {
+                    system.OnPeerEnter(peer);
+                }
             };
             
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>

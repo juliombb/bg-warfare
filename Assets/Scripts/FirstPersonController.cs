@@ -9,6 +9,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private Transform raycaster;
     [SerializeField] private GameObject cube;
+    private event Action<Vector3, Vector3, int> shotListener;
     private float speed = 0.25f;
     private float ySense = 2f;
     private float xSense = 1.5f;
@@ -36,6 +37,21 @@ public class FirstPersonController : MonoBehaviour
         HandleShot();
     }
 
+    public void OnShot(Action<Vector3, Vector3, int> listener)
+    {
+        shotListener += listener;
+    }
+    
+    public void RemoveOnShot(Action<Vector3, Vector3, int> listener)
+    {
+        shotListener -= listener;
+    }
+
+    public void TakeShot()
+    {
+        Debug.Log("I was shot!");
+    }
+
     void FixedUpdate()
     {
         HandleAim();
@@ -52,9 +68,10 @@ public class FirstPersonController : MonoBehaviour
     private void OnShotEntered() {
         var mouseRay = _camera.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(mouseRay.origin, mouseRay.direction, out var hit, 200);
-            
+
         if (hit.collider == null)
         {
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1);
             return;
         }
 
@@ -63,7 +80,12 @@ public class FirstPersonController : MonoBehaviour
         var target = hit.collider.gameObject;
         if (target.CompareTag("RemotePlayer"))
         {
-            target.GetComponent<RemotePlayerController>().Die(hit.point, mouseRay.direction);
+            var remotePlayer = target.GetComponent<RemotePlayerController>();
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, remotePlayer.Id);
+        }
+        else
+        {
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1);
         }
     }
 

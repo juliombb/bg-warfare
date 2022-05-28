@@ -64,8 +64,10 @@ namespace DefaultNamespace
         {
             _handlers.Clear();
             gameObject.GetOrAddComponent<ClientPositionMonitor>().Setup(baseClient, server);
+            gameObject.GetOrAddComponent<ClientShotMonitor>().Setup(baseClient, server);
 
             AddSystem(new MovementClientSystem());
+            AddSystem(new ShotClientSystem());
             foreach (var handlers in _handlers.Values)
             {
                 handlers.Install(baseClient, server);

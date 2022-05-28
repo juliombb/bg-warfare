@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
+using Model;
 using UnityEngine;
 
 public class RemotePlayerController : MonoBehaviour
@@ -9,7 +10,8 @@ public class RemotePlayerController : MonoBehaviour
     [SerializeField] private GameObject defaultModel;
     [SerializeField] private GameObject ragdoll;
     
-    private Queue<PlayerSnapshot> _snapshotQueue = new Queue<PlayerSnapshot>();
+    private Queue<PlayerSnapshot> _snapshotQueue = new();
+    private Queue<PlayerSnapshot> _timedSnapshots = new();
     private PlayerSnapshot _previous;
     private PlayerSnapshot _next;
     private float _lastInterpolation = 0f;
@@ -17,6 +19,64 @@ public class RemotePlayerController : MonoBehaviour
     private static readonly int Walking = Animator.StringToHash("Walking");
     private int _animationCooldown = 0;
     private float? _timeToStart = null;
+    private bool _checking = false;
+    private int _id = -1;
+    private static readonly int Fire = Animator.StringToHash("Fire");
+    public int Id => _id;
+
+    public void SetupId(int id)
+    {
+        if (_id != -1)
+        {
+            _id = id;
+        }
+    }
+
+    private void StartCheck(float time)
+    {
+        _checking = true;
+        PlayerSnapshot lastSnapshot = null;
+        PlayerSnapshot nextSnapshot = null; 
+        foreach (var playerSnapshot in _timedSnapshots)
+        {
+            if (playerSnapshot.Time < time)
+            {
+                lastSnapshot = playerSnapshot;
+            }
+            else
+            {
+                nextSnapshot = playerSnapshot;
+                break;
+            }
+        }
+
+        if (nextSnapshot == null && _previous != null)
+        {
+            nextSnapshot = _previous;
+        }
+
+        if (lastSnapshot == null || nextSnapshot == null)
+        {
+            transform.position = _previous?.Position ?? transform.position;
+            return;
+        }
+        
+        float duration = (lastSnapshot.Sequence - nextSnapshot.Sequence) * Config.TickRate;
+        float elapsedTime = time - lastSnapshot.Time;
+
+        var smoothStep = Mathf.SmoothStep(0.0f, 1.0f, Mathf.Clamp01(elapsedTime / duration));
+        transform.position = Vector3.Lerp(_previous.Position, _next.Position, smoothStep);
+    }
+
+    private void FinishCheck()
+    {
+        _checking = false;
+    }
+
+    public void OnShot()
+    {
+        _animator.SetTrigger(Fire);
+    }
 
     private void Start()
     {
@@ -73,12 +133,21 @@ public class RemotePlayerController : MonoBehaviour
             _previous = _next;
             _next = _snapshotQueue.Dequeue();
             _lastInterpolation = time;
+            if (_timedSnapshots.Count > 5)
+            {
+                _timedSnapshots.Dequeue();
+            }
+            _timedSnapshots.Enqueue(_previous.Timed(time));
             // Debug.Log($"New snapshot: {_previous} {_next}");
         }
     }
 
     private void Update()
     {
+        if (_checking)
+        {
+            return;
+        }
         if (_previous == null)
         {
             if (_animationCooldown++ > 5)

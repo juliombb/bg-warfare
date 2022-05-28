@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using LiteNetLib.Utils;
+using Model;
 using UnityEngine;
 
-namespace DefaultNamespace.Serialization
+namespace Serialization
 {
     public static class PlayerSnapshotSerializer
     {
