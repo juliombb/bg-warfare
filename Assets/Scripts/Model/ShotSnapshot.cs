@@ -19,6 +19,11 @@ namespace Model
         {
             return new ShotSnapshot(target, Position, Direction);
         }
+        
+        public ShotSnapshot WithPosition(Vector3 pos)
+        {
+            return new ShotSnapshot(Target, pos, Direction);
+        }
 
         public override string ToString()
         {

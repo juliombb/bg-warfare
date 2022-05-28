@@ -25,6 +25,8 @@ public class FirstPersonController : MonoBehaviour
     private static readonly int Running = Animator.StringToHash("Running");
     private static readonly int Walking = Animator.StringToHash("Walking");
     private static readonly int Fire = Animator.StringToHash("Fire");
+    private bool _randomWalk = false;
+    private float _startOfRandomWalk = 0.0f;
 
     private void Start()
     {
@@ -36,6 +38,18 @@ public class FirstPersonController : MonoBehaviour
     private void Update()
     {
         HandleShot();
+    }
+
+    private void HandleRandomWalk()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            _randomWalk = !_randomWalk;
+            if (_randomWalk)
+            {
+                _startOfRandomWalk = Time.time;
+            }
+        }
     }
 
     public void OnShot(Action<Vector3, Vector3, int> listener)
@@ -58,6 +72,8 @@ public class FirstPersonController : MonoBehaviour
         HandleAim();
 
         var actualSpeed = CheckSprint();
+
+        HandleRandomWalk();
 
         HandleMovement(actualSpeed);
 
@@ -150,6 +166,11 @@ public class FirstPersonController : MonoBehaviour
     {
         float x = Input.GetAxis("Horizontal") * actualSpeed;
         float z = Input.GetAxis("Vertical") * actualSpeed;
+        if (_randomWalk)
+        {
+            var time = Time.time - _startOfRandomWalk;
+            x = Mathf.Sin(time) * actualSpeed;
+        }
 
         var position = transform.position;
         var previousPosition = position;

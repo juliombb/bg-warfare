@@ -150,7 +150,7 @@ public class RemotePlayerController : MonoBehaviour
         }
         if (_previous == null)
         {
-            if (_animationCooldown++ > 5)
+            if (_animationCooldown++ > 5 && _animator != null)
             {
                 _animator.SetBool(Walking, false);
             }

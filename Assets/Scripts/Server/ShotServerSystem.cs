@@ -26,11 +26,9 @@ namespace Server
         {
             using var reader = new BinaryReader(new MemoryStream(data));
             var shot = reader.ReadShotSnapshot();
-            Debug.Log($"received shot with target {shot.Target}");
             if (shot.Target > 0)
             {
                 shot = ValidateShot(clientTime: reader.ReadInt64(), shot: shot);
-                Debug.Log($"validated target is {shot.Target}");
             }
             BroadcastShot(peer, shot);
         }
@@ -38,7 +36,7 @@ namespace Server
         private ShotSnapshot ValidateShot(long clientTime, ShotSnapshot shot)
         {
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
-            if (targetPlayer == null) return CancelShot(shot);
+            if (targetPlayer == null) return CancelShot(shot, Vector3.zero);
 
             var time = DateTime.FromBinary(clientTime);
             var offset = DateTime.UtcNow - time;
@@ -46,21 +44,20 @@ namespace Server
             targetPlayer.StartCheck((float)timeOfHitInServerTime);
             
             Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
-            if (hit.collider == null) return CancelShot(shot);
+            if (hit.collider == null) return CancelShot(shot, targetPlayer.transform.position);
 
             var target = hit.collider.gameObject;
-            if (!target.CompareTag("RemotePlayer")) return CancelShot(shot);
+            if (!target.CompareTag("RemotePlayer")) return CancelShot(shot, targetPlayer.transform.position);
 
             var remotePlayer = target.GetComponent<RemotePlayerController>();
-            if (remotePlayer.Id != shot.Target) return CancelShot(shot);
-            Debug.Log("shot hit!");
+            if (remotePlayer.Id != shot.Target) return CancelShot(shot, targetPlayer.transform.position);
 
             targetPlayer.FinishCheck();
             return new ShotSnapshot(shot.Target, hit.collider.transform.position, shot.Direction);
             // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
         }
 
-        private static ShotSnapshot CancelShot(ShotSnapshot shot)
+        private static ShotSnapshot CancelShot(ShotSnapshot shot, Vector3 colliderPosition)
         {
             Debug.Log("Shot canceled!!!");
             return shot.WithTarget(-1);
