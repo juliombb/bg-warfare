@@ -33,20 +33,16 @@ public class RemotePlayerController : MonoBehaviour
         }
     }
 
-    public void StartCheck(int sequence)
+    public Vector3 OffsetFrom(int sequence)
     {
-        _checking = true;
-
-        
         PlayerSnapshot lastSnapshot = null;
         PlayerSnapshot nextSnapshot = null;
         Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
         var queue = _timedSnapshots;
-        if (sequence == Sequence) return;
+        if (sequence == Sequence) return Vector3.zero;
         if (sequence == Sequence + 1 && _next != null)
         {
-            transform.position = _next.Position;
-            return;
+            return transform.position - _next.Position;
         }
         if (sequence > Sequence + 1)
         {
@@ -73,16 +69,10 @@ public class RemotePlayerController : MonoBehaviour
 
         if (lastSnapshot == null || nextSnapshot == null)
         {
-            transform.position = _previous?.Position ?? transform.position;
-            return;
+            return transform.position - (_previous?.Position ?? transform.position);
         }
 
-        transform.position = lastSnapshot.Position;
-    }
-
-    public void FinishCheck()
-    {
-        _checking = false;
+        return transform.position - lastSnapshot.Position;
     }
 
     public void OnShot()

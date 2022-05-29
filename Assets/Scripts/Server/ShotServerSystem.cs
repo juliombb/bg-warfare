@@ -38,33 +38,29 @@ namespace Server
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
             if (targetPlayer == null) return CancelShot(Vector3.zero, Vector3.zero, "target is null");
 
-            var initialPlayerPosition = targetPlayer.GetComponent<CapsuleCollider>().transform.position;
-            targetPlayer.StartCheck(clientSequence);
+            var posOffset = targetPlayer.OffsetFrom(clientSequence);
+            // offsetFrom = transform - rollback
+            // rollback = transform - offsetFrom
+            // forward(rollback) = transform = rollback + offsetFrom
+            // forward(Shot) = shot + offsetFrom
+            Physics.Raycast(shot.Position + posOffset, shot.Direction, out var hit, Config.MaxShotDistance);
+            var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
+            var initialPlayerPosition = targetPlayerCollider.transform.position;
+            var rollbackPosition = initialPlayerPosition - posOffset;
+            if (hit.collider == null) 
+                return CancelShot(rollbackPosition, initialPlayerPosition, "no hit");
 
-            try
-            {
-                Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
-                var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
-                if (hit.collider == null) 
-                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "no hit");
+            var target = hit.collider.gameObject;
+            if (!target.CompareTag("RemotePlayer"))
+                return CancelShot(rollbackPosition, initialPlayerPosition, $"hit {target}");
 
-                var target = hit.collider.gameObject;
-                if (!target.CompareTag("RemotePlayer"))
-                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, $"hit {target}");
+            var remotePlayer = target.GetComponent<RemotePlayerController>();
+            if (remotePlayer.Id != shot.Target)
+                return CancelShot(rollbackPosition, initialPlayerPosition, "wrong player");
 
-                var remotePlayer = target.GetComponent<RemotePlayerController>();
-                if (remotePlayer.Id != shot.Target)
-                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "wrong player");
-
-                var hitCollPosition = hit.collider.transform.position;
-                Debug.Log($"shot hit at {hit.point}!");
-                return new ShotSnapshot(shot.Target, hitCollPosition, initialPlayerPosition);
-                // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
-            }
-            finally
-            {
-                targetPlayer.FinishCheck();
-            }
+            Debug.Log($"shot hit at {hit.point}!");
+            return new ShotSnapshot(shot.Target, rollbackPosition, initialPlayerPosition);
+            // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
         }
 
         private static ShotSnapshot CancelShot(Vector3 colliderPosition, Vector3 initialPlayerPosition, string reason)
