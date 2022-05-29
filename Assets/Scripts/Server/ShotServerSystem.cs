@@ -29,8 +29,7 @@ namespace Server
             if (shot.Target >= 0)
             {
                 var clientTime = DateTime.FromBinary(reader.ReadInt64());
-                var ping = _serverController.Server.GetPeerById(peer).Ping;
-                shot = ValidateShot(clientTime: clientTime.AddMilliseconds(-ping) , shot: shot);
+                shot = ValidateShot(clientTime: clientTime, shot: shot);
             }
             BroadcastShot(peer, shot);
         }
