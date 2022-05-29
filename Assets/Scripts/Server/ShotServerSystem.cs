@@ -36,30 +36,32 @@ namespace Server
         private ShotSnapshot ValidateShot(long clientTime, ShotSnapshot shot)
         {
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
-            if (targetPlayer == null) return CancelShot(shot, Vector3.zero, "target is null");
+            if (targetPlayer == null) return CancelShot(Vector3.zero, Vector3.zero, "target is null");
 
             var time = DateTime.FromBinary(clientTime);
             var offset = DateTime.UtcNow - time;
             var timeOfHitInServerTime = Time.time - offset.TotalSeconds;
+            var initialPlayerPosition = targetPlayer.GetComponent<CapsuleCollider>().transform.position;
             targetPlayer.StartCheck((float)timeOfHitInServerTime);
 
             try
             {
                 Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
                 var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
-                if (hit.collider == null) return CancelShot(shot, targetPlayerCollider.transform.position, "no hit");
+                if (hit.collider == null) 
+                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "no hit");
 
                 var target = hit.collider.gameObject;
                 if (!target.CompareTag("RemotePlayer"))
-                    return CancelShot(shot, targetPlayerCollider.transform.position, "hit not remote");
+                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "hit not remote");
 
                 var remotePlayer = target.GetComponent<RemotePlayerController>();
                 if (remotePlayer.Id != shot.Target)
-                    return CancelShot(shot, targetPlayerCollider.transform.position, "wrong player");
+                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "wrong player");
 
                 var hitCollPosition = hit.collider.transform.position;
                 Debug.Log($"shot hit at {hit.point}!");
-                return new ShotSnapshot(shot.Target, hitCollPosition, shot.Direction);
+                return new ShotSnapshot(shot.Target, hitCollPosition, initialPlayerPosition);
                 // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
             }
             finally
@@ -68,10 +70,10 @@ namespace Server
             }
         }
 
-        private static ShotSnapshot CancelShot(ShotSnapshot shot, Vector3 colliderPosition, string reason)
+        private static ShotSnapshot CancelShot(Vector3 colliderPosition, Vector3 initialPlayerPosition, string reason)
         {
             Debug.Log($"Shot canceled!!! {reason}");
-            return shot.WithTarget(-1).WithPosition(colliderPosition);
+            return new ShotSnapshot(-1, colliderPosition, initialPlayerPosition);
         }
 
         private void BroadcastShot(int shooter, ShotSnapshot shot)
