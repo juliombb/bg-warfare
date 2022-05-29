@@ -44,13 +44,14 @@ namespace Server
             targetPlayer.StartCheck((float)timeOfHitInServerTime);
             
             Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
-            if (hit.collider == null) return CancelShot(shot, targetPlayer.transform.position);
+            var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
+            if (hit.collider == null) return CancelShot(shot, targetPlayerCollider.transform.position);
 
             var target = hit.collider.gameObject;
-            if (!target.CompareTag("RemotePlayer")) return CancelShot(shot, targetPlayer.transform.position);
+            if (!target.CompareTag("RemotePlayer")) return CancelShot(shot, targetPlayerCollider.transform.position);
 
             var remotePlayer = target.GetComponent<RemotePlayerController>();
-            if (remotePlayer.Id != shot.Target) return CancelShot(shot, targetPlayer.transform.position);
+            if (remotePlayer.Id != shot.Target) return CancelShot(shot, targetPlayerCollider.transform.position);
 
             targetPlayer.FinishCheck();
             return new ShotSnapshot(shot.Target, hit.collider.transform.position, shot.Direction);
@@ -60,7 +61,7 @@ namespace Server
         private static ShotSnapshot CancelShot(ShotSnapshot shot, Vector3 colliderPosition)
         {
             Debug.Log("Shot canceled!!!");
-            return shot.WithTarget(-1);
+            return shot.WithTarget(-1).WithPosition(colliderPosition);
         }
 
         private void BroadcastShot(int shooter, ShotSnapshot shot)

@@ -42,7 +42,7 @@ namespace Client
 
             if (fromPlayer == _clientPeerId)
             {
-                _firstPersonController.RenderCapsule(shot.Position);
+                _firstPersonController.RenderCapsule(shot.Position, false);
             }
             _remotePlayersController.TakeShot(shot.Target, shot.Position, shot.Direction);
             

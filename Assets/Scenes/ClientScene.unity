@@ -697,6 +697,7 @@ MonoBehaviour:
   animator: {fileID: 95066877241571296}
   raycaster: {fileID: 836955258}
   capsule: {fileID: 5375397098035223750, guid: 57a6ca4888a6a439c866d1ef110eed49, type: 3}
+  altCapsuleMaterial: {fileID: 2100000, guid: 43e53495bcd1843d0bb6c03c25b6daa1, type: 2}
 --- !u!1 &1819186509
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,12 +10,15 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private Transform raycaster;
     [SerializeField] private GameObject capsule;
+    [SerializeField] private Material altCapsuleMaterial;
     private event Action<Vector3, Vector3, int> shotListener;
     private float speed = 0.25f;
     private float ySense = 2f;
     private float xSense = 1.5f;
     private float jumpForce = 200f;
     private float fireRate = 0.134f;
+    private GameObject _capsule1;
+    private GameObject _capsule2;
 
     private Camera _camera;
     private Rigidbody _rigidbody;
@@ -82,9 +85,34 @@ public class FirstPersonController : MonoBehaviour
         UpdateCursor();
     }
 
-    public void RenderCapsule(Vector3 position)
+    public void RenderCapsule(Vector3 position, bool alt)
     {
-        Instantiate(capsule, position, Quaternion.identity);
+        if (alt)
+        {
+            RenderCapsule(position, ref _capsule1, true);
+        }
+        else
+        {
+            RenderCapsule(position, ref _capsule2, false);
+        }
+    }
+
+    private void RenderCapsule(Vector3 position, ref GameObject obj, bool alt)
+    {
+        if (obj == null)
+        {
+            obj = Instantiate(obj, position, Quaternion.identity);
+        }
+        else
+        {
+            obj.transform.position = position;
+        }
+
+        if (alt)
+        {
+            var objRenderer = obj.GetComponentInChildren<MeshRenderer>();
+            objRenderer.materials[0] = altCapsuleMaterial;
+        }
     }
 
     private void OnShotEntered() {
@@ -103,6 +131,7 @@ public class FirstPersonController : MonoBehaviour
         if (target.CompareTag("RemotePlayer"))
         {
             var remotePlayer = target.GetComponent<RemotePlayerController>();
+            RenderCapsule(target.transform.position, true);
             shotListener?.Invoke(mouseRay.origin, mouseRay.direction, remotePlayer.Id);
         }
         else
