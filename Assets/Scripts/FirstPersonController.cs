@@ -12,7 +12,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject capsule;
     [SerializeField] private Material altCapsuleMaterial;
     [SerializeField] private Material altCapsuleMaterial2;
-    private event Action<Vector3, Vector3, int> shotListener;
+    private event Action<Vector3, Vector3, int, int> shotListener;
     private float speed = 0.25f;
     private float ySense = 2f;
     private float xSense = 1.5f;
@@ -57,12 +57,12 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
-    public void OnShot(Action<Vector3, Vector3, int> listener)
+    public void OnShot(Action<Vector3, Vector3, int, int> listener)
     {
         shotListener += listener;
     }
     
-    public void RemoveOnShot(Action<Vector3, Vector3, int> listener)
+    public void RemoveOnShot(Action<Vector3, Vector3, int, int> listener)
     {
         shotListener -= listener;
     }
@@ -151,7 +151,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (hit.collider == null)
         {
-            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1);
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1, -1);
             return;
         }
 
@@ -162,11 +162,11 @@ public class FirstPersonController : MonoBehaviour
         {
             var remotePlayer = target.GetComponent<RemotePlayerController>();
             RenderCapsule(hit.collider.transform.position, 2);
-            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, remotePlayer.Id);
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, remotePlayer.Id, remotePlayer.Sequence);
         }
         else
         {
-            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1);
+            shotListener?.Invoke(mouseRay.origin, mouseRay.direction, -1, -1);
         }
     }
 

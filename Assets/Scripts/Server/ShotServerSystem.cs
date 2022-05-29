@@ -28,21 +28,18 @@ namespace Server
             var shot = reader.ReadShotSnapshot();
             if (shot.Target >= 0)
             {
-                var clientTime = DateTime.FromBinary(reader.ReadInt64());
-                shot = ValidateShot(clientTime: clientTime, shot: shot);
+                shot = ValidateShot(clientSequence: reader.ReadInt32(), shot: shot);
             }
             BroadcastShot(peer, shot);
         }
 
-        private ShotSnapshot ValidateShot(DateTime clientTime, ShotSnapshot shot)
+        private ShotSnapshot ValidateShot(int clientSequence, ShotSnapshot shot)
         {
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
             if (targetPlayer == null) return CancelShot(Vector3.zero, Vector3.zero, "target is null");
 
-            var offset = DateTime.UtcNow - clientTime;
-            var timeOfHitInServerTime = Time.time - offset.TotalSeconds;
             var initialPlayerPosition = targetPlayer.GetComponent<CapsuleCollider>().transform.position;
-            targetPlayer.StartCheck((float)timeOfHitInServerTime);
+            targetPlayer.StartCheck(clientSequence);
 
             try
             {

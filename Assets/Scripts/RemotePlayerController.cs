@@ -9,7 +9,8 @@ public class RemotePlayerController : MonoBehaviour
 {
     [SerializeField] private GameObject defaultModel;
     [SerializeField] private GameObject ragdoll;
-    
+
+    public int Sequence => _previous?.Sequence ?? _next?.Sequence ?? 0;
     private Queue<PlayerSnapshot> _snapshotQueue = new();
     private Queue<PlayerSnapshot> _timedSnapshots = new();
     private PlayerSnapshot _previous;
@@ -32,14 +33,15 @@ public class RemotePlayerController : MonoBehaviour
         }
     }
 
-    public void StartCheck(float time)
+    public void StartCheck(int sequence)
     {
         _checking = true;
         PlayerSnapshot lastSnapshot = null;
-        PlayerSnapshot nextSnapshot = null; 
+        PlayerSnapshot nextSnapshot = null;
+        Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
         foreach (var playerSnapshot in _timedSnapshots)
         {
-            if (playerSnapshot.Time < time)
+            if (playerSnapshot.Sequence <= sequence)
             {
                 lastSnapshot = playerSnapshot;
             }
@@ -49,6 +51,7 @@ public class RemotePlayerController : MonoBehaviour
                 break;
             }
         }
+        Debug.Log($"found snapshots: {lastSnapshot} -> {nextSnapshot}");
 
         if (nextSnapshot == null && _previous != null)
         {
@@ -60,12 +63,8 @@ public class RemotePlayerController : MonoBehaviour
             transform.position = _previous?.Position ?? transform.position;
             return;
         }
-        
-        float duration = (nextSnapshot.Sequence - lastSnapshot.Sequence) * Config.TickRate;
-        float elapsedTime = time - lastSnapshot.Time;
 
-        var smoothStep = Mathf.SmoothStep(0.0f, 1.0f, Mathf.Clamp01(elapsedTime / duration));
-        transform.position = Vector3.Lerp(_previous.Position, _next.Position, smoothStep);
+        transform.position = _previous.Position;
     }
 
     public void FinishCheck()
@@ -137,7 +136,7 @@ public class RemotePlayerController : MonoBehaviour
             {
                 _timedSnapshots.Dequeue();
             }
-            _timedSnapshots.Enqueue(_previous.Timed(time));
+            _timedSnapshots.Enqueue(_next.Timed(time));
             // Debug.Log($"New snapshot: {_previous} {_next}");
         }
     }

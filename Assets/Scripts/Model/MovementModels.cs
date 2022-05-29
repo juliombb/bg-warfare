@@ -24,7 +24,7 @@ namespace Model
 
         public override string ToString()
         {
-            return $"s{Sequence} {Position.ToString()}";
+            return $"t{Time} s{Sequence} {Position.ToString()}";
         }
     }
 }

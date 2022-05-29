@@ -20,12 +20,12 @@ namespace Client
             _server = server.Peer;
         }
 
-        private void OnShot(Vector3 position, Vector3 direction, int hitId)
+        private void OnShot(Vector3 position, Vector3 direction, int hitId, int hitSequence)
         {
             _writer.Reset();
             _writer.Put((byte)ServerCommand.Shot);
             _writer.PutShotSnapshot(new ShotSnapshot(hitId, position, direction));
-            if (hitId != -1) _writer.Put(System.DateTime.UtcNow.AddSeconds(-Time.deltaTime).ToBinary());
+            if (hitId != -1) _writer.Put(hitSequence);
             _server.Send(_writer, hitId > 0 ? DeliveryMethod.ReliableUnordered : DeliveryMethod.Unreliable);
         }
     }
