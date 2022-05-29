@@ -25,7 +25,7 @@ namespace Client
             _writer.Reset();
             _writer.Put((byte)ServerCommand.Shot);
             _writer.PutShotSnapshot(new ShotSnapshot(hitId, position, direction));
-            if (hitId != -1) _writer.Put(System.DateTime.UtcNow.ToBinary());
+            if (hitId != -1) _writer.Put(System.DateTime.UtcNow.AddSeconds(-Time.deltaTime).ToBinary());
             _server.Send(_writer, hitId > 0 ? DeliveryMethod.ReliableUnordered : DeliveryMethod.Unreliable);
         }
     }
