@@ -50,7 +50,7 @@ namespace Server
 
                 var target = hit.collider.gameObject;
                 if (!target.CompareTag("RemotePlayer"))
-                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, "hit not remote");
+                    return CancelShot(targetPlayerCollider.transform.position, initialPlayerPosition, $"hit {target}");
 
                 var remotePlayer = target.GetComponent<RemotePlayerController>();
                 if (remotePlayer.Id != shot.Target)

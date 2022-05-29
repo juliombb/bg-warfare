@@ -36,10 +36,23 @@ public class RemotePlayerController : MonoBehaviour
     public void StartCheck(int sequence)
     {
         _checking = true;
+
+        
         PlayerSnapshot lastSnapshot = null;
         PlayerSnapshot nextSnapshot = null;
         Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
-        foreach (var playerSnapshot in _timedSnapshots)
+        var queue = _timedSnapshots;
+        if (sequence == Sequence) return;
+        if (sequence == Sequence + 1 && _next != null)
+        {
+            transform.position = _next.Position;
+            return;
+        }
+        if (sequence > Sequence + 1)
+        {
+            queue = _snapshotQueue;
+        }
+        foreach (var playerSnapshot in queue)
         {
             if (playerSnapshot.Sequence <= sequence)
             {
@@ -64,7 +77,7 @@ public class RemotePlayerController : MonoBehaviour
             return;
         }
 
-        transform.position = _previous.Position;
+        transform.position = lastSnapshot.Position;
     }
 
     public void FinishCheck()
@@ -132,7 +145,7 @@ public class RemotePlayerController : MonoBehaviour
             _previous = _next;
             _next = _snapshotQueue.Dequeue();
             _lastInterpolation = time;
-            if (_timedSnapshots.Count > 5)
+            if (_timedSnapshots.Count > 8)
             {
                 _timedSnapshots.Dequeue();
             }
