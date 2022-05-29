@@ -173,7 +173,10 @@ public class RemotePlayerController : MonoBehaviour
             elapsedTime / duration
         );
 
-        _animator.SetBool(Walking, true);
+        if (_animator != null)
+        {
+            _animator.SetBool(Walking, true);
+        }
 
         _animationCooldown = 0;
     }

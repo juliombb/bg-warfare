@@ -101,7 +101,7 @@ public class FirstPersonController : MonoBehaviour
     {
         if (obj == null)
         {
-            obj = Instantiate(obj, position, Quaternion.identity);
+            obj = Instantiate(capsule, position, Quaternion.identity);
         }
         else
         {
@@ -111,7 +111,7 @@ public class FirstPersonController : MonoBehaviour
         if (alt)
         {
             var objRenderer = obj.GetComponentInChildren<MeshRenderer>();
-            objRenderer.materials[0] = altCapsuleMaterial;
+            objRenderer.material = altCapsuleMaterial;
         }
     }
 
@@ -131,7 +131,7 @@ public class FirstPersonController : MonoBehaviour
         if (target.CompareTag("RemotePlayer"))
         {
             var remotePlayer = target.GetComponent<RemotePlayerController>();
-            RenderCapsule(target.transform.position, true);
+            RenderCapsule(hit.collider.transform.position, true);
             shotListener?.Invoke(mouseRay.origin, mouseRay.direction, remotePlayer.Id);
         }
         else
