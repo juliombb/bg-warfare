@@ -18,10 +18,6 @@ namespace Client
             _fpc = baseClient.GetComponentInChildren<FirstPersonController>();
             _fpc.OnShot(OnShot);
             _server = server.Peer;
-            _writer.Reset();
-            _writer.Put((byte)ServerCommand.InitialTime);
-            _writer.Put(Time.time);
-            _server.Send(_writer, DeliveryMethod.ReliableUnordered);
         }
 
         private void OnShot(Vector3 position, Vector3 direction, int hitId)
@@ -29,7 +25,7 @@ namespace Client
             _writer.Reset();
             _writer.Put((byte)ServerCommand.Shot);
             _writer.PutShotSnapshot(new ShotSnapshot(hitId, position, direction));
-            if (hitId != -1) _writer.Put(Time.time);
+            if (hitId != -1) _writer.Put(System.DateTime.UtcNow.ToBinary());
             _server.Send(_writer, hitId > 0 ? DeliveryMethod.ReliableUnordered : DeliveryMethod.Unreliable);
         }
     }
