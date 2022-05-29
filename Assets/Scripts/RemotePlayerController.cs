@@ -61,7 +61,7 @@ public class RemotePlayerController : MonoBehaviour
             return;
         }
         
-        float duration = (lastSnapshot.Sequence - nextSnapshot.Sequence) * Config.TickRate;
+        float duration = (nextSnapshot.Sequence - lastSnapshot.Sequence) * Config.TickRate;
         float elapsedTime = time - lastSnapshot.Time;
 
         var smoothStep = Mathf.SmoothStep(0.0f, 1.0f, Mathf.Clamp01(elapsedTime / duration));
