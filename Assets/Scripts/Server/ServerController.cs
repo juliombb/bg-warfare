@@ -20,7 +20,9 @@ namespace Server
         private void Start()
         {
             _handlers.Add((byte) ServerCommand.PositionOfPlayer, new MovementServerSystem(this, baseGame));
-            _handlers.Add((byte) ServerCommand.Shot, new ShotServerSystem(this, baseGame));
+            var timeSystem = new TimeServerSystem();
+            _handlers.Add((byte) ServerCommand.InitialTime, timeSystem);
+            _handlers.Add((byte) ServerCommand.Shot, new ShotServerSystem(this, baseGame, timeSystem));
             _listener = new EventBasedNetListener();
             Server = new NetManager(_listener);
             Server.Start(9050 /* port */);

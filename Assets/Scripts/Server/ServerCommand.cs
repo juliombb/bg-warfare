@@ -5,6 +5,7 @@ namespace Server
         PositionOfPlayer,
         PositionOfPlayers,
         ClientPeerId,
-        Shot
+        Shot,
+        InitialTime
     }
 }

@@ -15,12 +15,14 @@ namespace Server
 
         private readonly ServerController _serverController;
         private readonly RemotePlayersController _remotePlayersController;
+        private readonly TimeServerSystem _timeSystem;
         private readonly NetDataWriter _writer = new NetDataWriter();
 
-        public ShotServerSystem(ServerController serverController, GameObject baseGame)
+        public ShotServerSystem(ServerController serverController, GameObject baseGame, TimeServerSystem timeSystem)
         {
             _remotePlayersController = baseGame.GetComponentInChildren<RemotePlayersController>();
             _serverController = serverController;
+            _timeSystem = timeSystem;
         }
         public void Handle(int peer, byte[] data)
         {
@@ -28,19 +30,17 @@ namespace Server
             var shot = reader.ReadShotSnapshot();
             if (shot.Target >= 0)
             {
-                shot = ValidateShot(clientTime: reader.ReadInt64(), shot: shot);
+                shot = ValidateShot(shooter: peer, clientTime: reader.ReadSingle(), shot: shot);
             }
             BroadcastShot(peer, shot);
         }
 
-        private ShotSnapshot ValidateShot(long clientTime, ShotSnapshot shot)
+        private ShotSnapshot ValidateShot(int shooter, float clientTime, ShotSnapshot shot)
         {
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
             if (targetPlayer == null) return CancelShot(Vector3.zero, Vector3.zero, "target is null");
 
-            var time = DateTime.FromBinary(clientTime);
-            var offset = DateTime.UtcNow - time;
-            var timeOfHitInServerTime = Time.time - offset.TotalSeconds;
+            var timeOfHitInServerTime = _timeSystem.UserTimeToServerTime(shooter, clientTime);
             var initialPlayerPosition = targetPlayer.GetComponent<CapsuleCollider>().transform.position;
             targetPlayer.StartCheck((float)timeOfHitInServerTime);
 
