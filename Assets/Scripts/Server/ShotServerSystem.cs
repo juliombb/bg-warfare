@@ -26,7 +26,7 @@ namespace Server
         {
             using var reader = new BinaryReader(new MemoryStream(data));
             var shot = reader.ReadShotSnapshot();
-            if (shot.Target > 0)
+            if (shot.Target >= 0)
             {
                 shot = ValidateShot(clientTime: reader.ReadInt64(), shot: shot);
             }
@@ -36,33 +36,41 @@ namespace Server
         private ShotSnapshot ValidateShot(long clientTime, ShotSnapshot shot)
         {
             var targetPlayer = _remotePlayersController.GetRemotePlayer(shot.Target);
-            if (targetPlayer == null) return CancelShot(shot, Vector3.zero);
+            if (targetPlayer == null) return CancelShot(shot, Vector3.zero, "target is null");
 
             var time = DateTime.FromBinary(clientTime);
             var offset = DateTime.UtcNow - time;
             var timeOfHitInServerTime = Time.time - offset.TotalSeconds;
             targetPlayer.StartCheck((float)timeOfHitInServerTime);
-            
-            Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
-            var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
-            if (hit.collider == null) return CancelShot(shot, targetPlayerCollider.transform.position);
 
-            var target = hit.collider.gameObject;
-            if (!target.CompareTag("RemotePlayer")) return CancelShot(shot, targetPlayerCollider.transform.position);
+            try
+            {
+                Physics.Raycast(shot.Position, shot.Direction, out var hit, Config.MaxShotDistance);
+                var targetPlayerCollider = targetPlayer.GetComponent<CapsuleCollider>();
+                if (hit.collider == null) return CancelShot(shot, targetPlayerCollider.transform.position, "no hit");
 
-            var remotePlayer = target.GetComponent<RemotePlayerController>();
-            if (remotePlayer.Id != shot.Target) return CancelShot(shot, targetPlayerCollider.transform.position);
+                var target = hit.collider.gameObject;
+                if (!target.CompareTag("RemotePlayer"))
+                    return CancelShot(shot, targetPlayerCollider.transform.position, "hit not remote");
 
-            var hitCollPosition = hit.collider.transform.position;
-            targetPlayer.FinishCheck();
-            Debug.Log($"shot hit at {hit.point} | collider {hitCollPosition}!");
-            return new ShotSnapshot(shot.Target, hitCollPosition, shot.Direction);
-            // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
+                var remotePlayer = target.GetComponent<RemotePlayerController>();
+                if (remotePlayer.Id != shot.Target)
+                    return CancelShot(shot, targetPlayerCollider.transform.position, "wrong player");
+
+                var hitCollPosition = hit.collider.transform.position;
+                Debug.Log($"shot hit at {hit.point}!");
+                return new ShotSnapshot(shot.Target, hitCollPosition, shot.Direction);
+                // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
+            }
+            finally
+            {
+                targetPlayer.FinishCheck();
+            }
         }
 
-        private static ShotSnapshot CancelShot(ShotSnapshot shot, Vector3 colliderPosition)
+        private static ShotSnapshot CancelShot(ShotSnapshot shot, Vector3 colliderPosition, string reason)
         {
-            Debug.Log("Shot canceled!!!");
+            Debug.Log($"Shot canceled!!! {reason}");
             return shot.WithTarget(-1).WithPosition(colliderPosition);
         }
 
@@ -74,7 +82,7 @@ namespace Server
                 _writer.Put((byte)ServerCommand.Shot);
                 _writer.Put(shooter);
                 _writer.PutShotSnapshot(shot);
-                netPeer.Send(_writer, shot.Target > 0 ? DeliveryMethod.ReliableUnordered : DeliveryMethod.Unreliable);
+                netPeer.Send(_writer, DeliveryMethod.ReliableUnordered);
             }
         }
 

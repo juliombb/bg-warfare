@@ -87,7 +87,12 @@ public class FirstPersonController : MonoBehaviour
 
     public void RenderCapsule(Vector3 position, bool alt)
     {
+        if (Vector3.Distance(position, _camera.ScreenPointToRay(Input.mousePosition).origin) < 1f)
+        {
+            return;
+        } 
         Debug.Log($"Rendering {alt} capsule at {position}");
+
         if (alt)
         {
             RenderCapsule(position, ref _capsule1, true);

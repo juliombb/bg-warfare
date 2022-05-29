@@ -29,6 +29,12 @@ namespace Client
             var fromPlayer = stream.ReadInt32();
             var shot = stream.ReadShotSnapshot();
             _remotePlayersController.OnShot(fromPlayer);
+
+            if (fromPlayer == _clientPeerId)
+            {
+                _firstPersonController.RenderCapsule(shot.Position, false);
+            }
+
             if (shot.Target < 0)
             {
                 return;
@@ -40,10 +46,6 @@ namespace Client
                 return;
             }
 
-            if (fromPlayer == _clientPeerId)
-            {
-                _firstPersonController.RenderCapsule(shot.Position, false);
-            }
             _remotePlayersController.TakeShot(shot.Target, shot.Position, shot.Direction);
             
         }
