@@ -32,8 +32,10 @@ namespace Client
 
             if (fromPlayer == _clientPeerId)
             {
-                _firstPersonController.RenderCapsule(shot.Position, 0);
-                _firstPersonController.RenderCapsule(shot.Direction, 1);
+                if (_firstPersonController.RenderCapsule(shot.Position, 0))
+                {
+                    _firstPersonController.RenderCapsule(shot.Direction, 1);
+                }
             }
 
             if (shot.Target < 0)

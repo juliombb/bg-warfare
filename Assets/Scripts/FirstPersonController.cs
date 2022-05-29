@@ -87,11 +87,11 @@ public class FirstPersonController : MonoBehaviour
         UpdateCursor();
     }
 
-    public void RenderCapsule(Vector3 position, int alt)
+    public bool RenderCapsule(Vector3 position, int alt)
     {
         if (Vector3.Distance(position, _camera.ScreenPointToRay(Input.mousePosition).origin) < 1f)
         {
-            return;
+            return false;
         } 
         Debug.Log($"Rendering {alt} capsule at {position}");
 
@@ -113,6 +113,8 @@ public class FirstPersonController : MonoBehaviour
                 break;
             }
         }
+
+        return true;
     }
 
     private void RenderCapsule(Vector3 position, ref GameObject obj, int alt)
