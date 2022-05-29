@@ -188,6 +188,9 @@ public class RemotePlayerController : MonoBehaviour
     
     public void Die(Vector3 hitPosition, Vector3 hitDirection)
     {
+        Debug.Log($"took shot at {hitPosition}");
+        return;
+        
         if (defaultModel == null)
         {
             return;
