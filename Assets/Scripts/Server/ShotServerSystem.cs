@@ -53,8 +53,10 @@ namespace Server
             var remotePlayer = target.GetComponent<RemotePlayerController>();
             if (remotePlayer.Id != shot.Target) return CancelShot(shot, targetPlayerCollider.transform.position);
 
+            var hitCollPosition = hit.collider.transform.position;
             targetPlayer.FinishCheck();
-            return new ShotSnapshot(shot.Target, hit.collider.transform.position, shot.Direction);
+            Debug.Log($"shot hit at {hit.point} | collider {hitCollPosition}!");
+            return new ShotSnapshot(shot.Target, hitCollPosition, shot.Direction);
             // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
         }
 

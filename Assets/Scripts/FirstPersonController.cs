@@ -87,6 +87,7 @@ public class FirstPersonController : MonoBehaviour
 
     public void RenderCapsule(Vector3 position, bool alt)
     {
+        Debug.Log($"Rendering {alt} capsule at {position}");
         if (alt)
         {
             RenderCapsule(position, ref _capsule1, true);
