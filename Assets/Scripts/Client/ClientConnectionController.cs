@@ -20,6 +20,7 @@ namespace DefaultNamespace
         private NetPeer _server;
         private int _clientPeerId = -1;
         private GameObject _loadingScreen;
+        private List<MonoBehaviour> _monitors;
 
         private Action _onDisconnect;
 
@@ -69,7 +70,7 @@ namespace DefaultNamespace
             _listener.PeerDisconnectedEvent += (peer, info) =>
             {
                 Debug.Log($"peer disconnected {peer?.Id} my: {_clientPeerId} server: {_server?.Id} reason: {info.Reason}");
-                if (info.Reason == DisconnectReason.ConnectionFailed)
+                if (info.Reason == DisconnectReason.ConnectionFailed || peer?.Id == 0)
                 {
                     _onDisconnect?.Invoke();
                 }
@@ -103,6 +104,9 @@ namespace DefaultNamespace
 
         private void OnDestroy()
         {
+            Destroy(gameObject.GetOrAddComponent<ClientPositionMonitor>());
+            Destroy(gameObject.GetOrAddComponent<ClientShotMonitor>());
+
             _client?.Stop();
         }
 
