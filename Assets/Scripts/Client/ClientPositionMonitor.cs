@@ -27,6 +27,7 @@ namespace Client
         private void FixedUpdate()
         {
             if (Time.time - _lastUpdate < Config.TickRate) return;
+            if (_monitoredTransform == null) return;
             _writer.Reset();
             var position = _monitoredTransform.position;
             var rotation = _monitoredTransform.rotation;
