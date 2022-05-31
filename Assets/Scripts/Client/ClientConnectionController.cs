@@ -50,6 +50,7 @@ namespace DefaultNamespace
             {
                 if (_server.Id != fromPeer.Id) return;
                 var command = dataReader.GetByte();
+                Debug.Log($"Received Command {(ServerCommand)command}");
                 if (command == (byte)ServerCommand.ClientPeerId && _clientPeerId == -1)
                 {
                     _clientPeerId = dataReader.GetInt();

@@ -44,6 +44,7 @@ namespace Server
                 _writer.PutPlayerSnapshot(playerToSend.Value);
             }
 
+            Debug.Log("sending position of players to peer");
             peer.Send(_writer, DeliveryMethod.ReliableOrdered);
         }
 
@@ -55,7 +56,10 @@ namespace Server
             _writer.Put(peer.Id);
             Debug.Log($"peer {peer.Id} disconnected");
 
-            peer.Send(_writer, DeliveryMethod.ReliableOrdered);
+            foreach (var netPeer in _serverController.Server.ConnectedPeerList)
+            {
+                netPeer.Send(_writer, DeliveryMethod.ReliableOrdered);
+            }
         }
 
         public void Poll()
