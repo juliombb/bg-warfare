@@ -72,9 +72,11 @@ namespace DefaultNamespace
                 Debug.Log($"peer disconnected {peer?.Id} my: {_clientPeerId} server: {_server?.Id} reason: {info.Reason}");
                 if (info.Reason == DisconnectReason.ConnectionFailed || peer?.Id == 0)
                 {
+                    _clientPeerId = -1;
                     Destroy(gameObject.GetOrAddComponent<ClientPositionMonitor>());
                     Destroy(gameObject.GetOrAddComponent<ClientShotMonitor>());
                     _onDisconnect?.Invoke();
+                    _onDisconnect = null;
                 }
             };
 

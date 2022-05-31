@@ -9,12 +9,13 @@ public class MenuController : MonoBehaviour
 {
     [SerializeField] private TMP_InputField serverInput;
     [SerializeField] private Button connectButton;
-    [SerializeField] private GameConnectionController gameConnectionController;
     [SerializeField] private TextMeshProUGUI errorMessage;
+    private GameConnectionController _gameConnectionController;
 
     void Start()
     {
         connectButton.onClick.AddListener(ConnectClicked);
+        _gameConnectionController = FindObjectOfType<GameConnectionController>();
     }
 
     private void ConnectClicked()
@@ -38,7 +39,7 @@ public class MenuController : MonoBehaviour
             }
             address = fullAddr[0];
         }
-        gameConnectionController.SetConnectionDetails(address, port);
+        _gameConnectionController.SetConnectionDetails(address, port);
     }
 
     public void ErrorMessage(string message)
