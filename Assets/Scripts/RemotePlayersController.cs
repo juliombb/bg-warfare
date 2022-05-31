@@ -19,10 +19,10 @@ public class RemotePlayersController : MonoBehaviour
         return null;
     }
 
-    public void OnPlayerEnter(int userId)
+    public void OnPlayerEnter(int userId, PlayerSnapshot snapshot)
     {
         if (_connectedPlayers.ContainsKey(userId)) return;
-        var remotePlayer = Instantiate(_remotePlayerPrefab);
+        var remotePlayer = Instantiate(_remotePlayerPrefab, snapshot.Position, snapshot.Rotation);
         var remoteController = remotePlayer.GetComponent<RemotePlayerController>();
         remoteController.SetupId(userId);
         _connectedPlayers[userId] = remoteController;
@@ -41,7 +41,7 @@ public class RemotePlayersController : MonoBehaviour
     {
         if (!_connectedPlayers.ContainsKey(player))
         {
-            OnPlayerEnter(player);
+            OnPlayerEnter(player, snapshot);
         }
         _connectedPlayers[player].OnNewSnapshot(snapshot);
     }
