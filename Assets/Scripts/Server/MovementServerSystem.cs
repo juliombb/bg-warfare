@@ -53,6 +53,7 @@ namespace Server
             _writer.Reset();
             _writer.Put((byte) ServerCommand.OtherPlayerDisconnected);
             _writer.Put(peer.Id);
+            Debug.Log($"peer {peer.Id} disconnected");
 
             peer.Send(_writer, DeliveryMethod.ReliableOrdered);
         }

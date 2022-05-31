@@ -25,6 +25,7 @@ namespace Client
         {
             using var stream = new BinaryReader(new MemoryStream(data));
             var player = stream.ReadInt32();
+            Debug.Log($"Player {player} left");
             _remotePlayersController.OnPlayerLeft(player);
         }
         
