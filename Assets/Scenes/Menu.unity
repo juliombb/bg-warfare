@@ -784,7 +784,7 @@ GameObject:
   - component: {fileID: 1016055823}
   - component: {fileID: 1016055822}
   m_Layer: 0
-  m_Name: ClientConnectionController
+  m_Name: GameConnectionController
   m_TagString: GameControl
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -802,7 +802,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe66f8c6c7e6451d82dca5e077de319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadingScreen: {fileID: 1294946229}
+  loadingScreen: {fileID: 1294946232}
+  clientConnectionController: {fileID: 811162834243588908, guid: 9b8574029303747109f4c4c7a4ef1694, type: 3}
 --- !u!4 &1016055823
 Transform:
   m_ObjectHideFlags: 0

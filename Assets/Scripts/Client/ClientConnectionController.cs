@@ -19,7 +19,7 @@ namespace DefaultNamespace
         private Dictionary<byte, IClientSystem> _handlers = new();
         private NetPeer _server;
         private int _clientPeerId = -1;
-        private GameObject _loadingScreen;
+        private Canvas _loadingScreen;
         private List<MonoBehaviour> _monitors;
 
         private Action _onDisconnect;
@@ -56,7 +56,7 @@ namespace DefaultNamespace
                     var server = new ServerData(_server, _clientPeerId);
                     Debug.Log($"Connected! I am peer {_clientPeerId}");
                     SetupServer(baseClient, server);
-                    _loadingScreen.SetActive(false);
+                    _loadingScreen.enabled = false;
                 }
 
                 if (_clientPeerId == -1) return;
@@ -72,6 +72,8 @@ namespace DefaultNamespace
                 Debug.Log($"peer disconnected {peer?.Id} my: {_clientPeerId} server: {_server?.Id} reason: {info.Reason}");
                 if (info.Reason == DisconnectReason.ConnectionFailed || peer?.Id == 0)
                 {
+                    Destroy(gameObject.GetOrAddComponent<ClientPositionMonitor>());
+                    Destroy(gameObject.GetOrAddComponent<ClientShotMonitor>());
                     _onDisconnect?.Invoke();
                 }
             };
@@ -105,13 +107,10 @@ namespace DefaultNamespace
 
         private void OnDestroy()
         {
-            Destroy(gameObject.GetOrAddComponent<ClientPositionMonitor>());
-            Destroy(gameObject.GetOrAddComponent<ClientShotMonitor>());
-
             _client?.Stop();
         }
 
-        public void SetLoadingScreen(GameObject loadingScreen)
+        public void SetLoadingScreen(Canvas loadingScreen)
         {
             _loadingScreen = loadingScreen;
         }

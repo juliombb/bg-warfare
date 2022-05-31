@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameConnectionController : MonoBehaviour
 {
-    private ClientConnectionController _clientConnectionController;
-    [SerializeField] private GameObject loadingScreen;
+    [SerializeField] private Canvas loadingScreen;
+    private ClientConnectionController _clientControllerInstance;
 
     private string _addr;
     private int _port;
@@ -28,7 +29,7 @@ public class GameConnectionController : MonoBehaviour
     {
         _addr = addr;
         _port = port;
-        loadingScreen.SetActive(true);
+        loadingScreen.enabled = true;
         SceneManager.LoadScene("ClientScene");
     }
 
@@ -36,15 +37,14 @@ public class GameConnectionController : MonoBehaviour
     {
         if (next.name == "ClientScene")
         {
-            _clientConnectionController = gameObject.AddComponent<ClientConnectionController>();
+            _clientControllerInstance = gameObject.GetOrAddComponent<ClientConnectionController>();
             var baseClient = GameObject.Find("BaseClient");
-            _clientConnectionController.SetLoadingScreen(loadingScreen);
-            _clientConnectionController.OnDisconnect(OnDisconnect);
-            _clientConnectionController.OnConnect(baseClient, _addr, _port);
+            _clientControllerInstance.SetLoadingScreen(loadingScreen);
+            _clientControllerInstance.OnDisconnect(OnDisconnect);
+            _clientControllerInstance.OnConnect(baseClient, _addr, _port);
         } else if (next.name == "Menu")
         {
-            Destroy(_clientConnectionController);
-            loadingScreen.SetActive(false);
+            loadingScreen.enabled = false;
             GameObject.Find("MenuController").GetComponent<MenuController>()
                 .ErrorMessage("You were disconnected from the server");
         }
