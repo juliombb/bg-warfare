@@ -29,6 +29,7 @@ AssetBundles/iOS/
 AssetBundles/iOS/*
 AssetBundles/Android/
 AssetBundles/Android/*
+ProjectSettings/RiderScriptEditorPersistedState.asset
 
 # Build Folders #
 Output/iOS/*/*
