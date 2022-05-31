@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - RemotePlayer
+  - GameControl
+  - LoadingScreen
   layers:
   - Default
   - TransparentFX

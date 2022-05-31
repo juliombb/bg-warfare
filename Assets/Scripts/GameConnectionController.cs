@@ -2,30 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameConnectionController : MonoBehaviour
 {
     private ClientConnectionController _clientConnectionController;
-    [SerializeField] private GameObject baseClient;
+    [SerializeField] private GameObject loadingScreen;
 
-    public void SetConnectionController(ClientConnectionController clientConnectionController)
+    private string _addr;
+    private int _port;
+    void Start()
     {
-        _clientConnectionController = clientConnectionController;
-    }
+        GameObject[] objs = GameObject.FindGameObjectsWithTag("GameControl");
 
-    private void OnConnectClicked()
-    {
-        _clientConnectionController = gameObject.AddComponent<ClientConnectionController>();
-        _clientConnectionController.OnConnect(baseClient);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
+        if (objs.Length > 1)
         {
-            OnConnectClicked();
+            Destroy(this.gameObject);
         }
+        DontDestroyOnLoad(this);
+        SceneManager.activeSceneChanged += ChangedActiveScene;
+    }
+
+    public void SetConnectionDetails(string addr, int port)
+    {
+        _addr = addr;
+        _port = port;
+        loadingScreen.SetActive(true);
+        SceneManager.LoadScene("ClientScene");
+    }
+
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        if (next.name == "ClientScene")
+        {
+            _clientConnectionController = gameObject.AddComponent<ClientConnectionController>();
+            var baseClient = GameObject.Find("BaseClient");
+            _clientConnectionController.SetLoadingScreen(loadingScreen);
+            _clientConnectionController.OnDisconnect(OnDisconnect);
+            _clientConnectionController.OnConnect(baseClient, _addr, _port);
+        } else if (next.name == "Menu")
+        {
+            Destroy(_clientConnectionController);
+            loadingScreen.SetActive(false);
+            GameObject.Find("MenuController").GetComponent<MenuController>()
+                .ErrorMessage("You were disconnected from the server");
+        }
+    }
+
+    private void OnDisconnect()
+    {
+        SceneManager.LoadScene("Menu");
     }
 }

@@ -8,6 +8,7 @@ using LiteNetLib.Utils;
 using Server;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DefaultNamespace
 {
@@ -18,13 +19,20 @@ namespace DefaultNamespace
         private Dictionary<byte, IClientSystem> _handlers = new();
         private NetPeer _server;
         private int _clientPeerId = -1;
+        private GameObject _loadingScreen;
 
+        private Action _onDisconnect;
+
+        public void OnDisconnect(Action action)
+        {
+            _onDisconnect = action;
+        }
         private void AddSystem(IClientSystem system)
         {
             _handlers.Add((byte)system.CommandKey, system);
         }
 
-        public void OnConnect(GameObject baseClient)
+        public void OnConnect(GameObject baseClient, string address, int port)
         {
             if (_listener == null || _client == null)
             {
@@ -32,7 +40,7 @@ namespace DefaultNamespace
                 _client = new NetManager(_listener);
             }
             _client.Start();
-            _client.Connect("localhost" /* host ip or name */, 9050 /* port */, "BgWarfare" /* text key or NetDataWriter */);
+            _client.Connect(address /* host ip or name */, port /* port */, "BgWarfare" /* text key or NetDataWriter */);
             _listener.PeerConnectedEvent += netPeer =>
             {
                 _server = netPeer;
@@ -47,6 +55,7 @@ namespace DefaultNamespace
                     var server = new ServerData(_server, _clientPeerId);
                     Debug.Log($"Connected! I am peer {_clientPeerId}");
                     SetupServer(baseClient, server);
+                    _loadingScreen.SetActive(false);
                 }
 
                 if (_clientPeerId == -1) return;
@@ -55,6 +64,15 @@ namespace DefaultNamespace
                     _handlers[command].Handle(dataReader.GetRemainingBytes());
                 }
                 dataReader.Recycle();
+            };
+
+            _listener.PeerDisconnectedEvent += (peer, info) =>
+            {
+                Debug.Log($"peer disconnected {peer?.Id} my: {_clientPeerId} server: {_server?.Id} reason: {info.Reason}");
+                if (info.Reason == DisconnectReason.ConnectionFailed)
+                {
+                    _onDisconnect?.Invoke();
+                }
             };
 
             StartCoroutine(Polling());
@@ -86,6 +104,11 @@ namespace DefaultNamespace
         private void OnDestroy()
         {
             _client?.Stop();
+        }
+
+        public void SetLoadingScreen(GameObject loadingScreen)
+        {
+            _loadingScreen = loadingScreen;
         }
     }
 }

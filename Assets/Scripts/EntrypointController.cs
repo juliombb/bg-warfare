@@ -16,6 +16,6 @@ public class EntrypointController : MonoBehaviour
             }
         }
 
-        SceneManager.LoadScene("ClientScene");
+        SceneManager.LoadScene("Menu");
     }
 }

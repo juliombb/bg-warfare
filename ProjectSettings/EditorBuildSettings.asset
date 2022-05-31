@@ -9,9 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Entrypoint.unity
     guid: 9494f058cf976460291e2655a1243860
   - enabled: 1
-    path: Assets/Scenes/ServerScene.unity
-    guid: 54358b176ed2c4d9b93e7209c5602958
+    path: Assets/Scenes/Menu.unity
+    guid: b3dddb00cce224161ba9a00a60f2e2df
   - enabled: 1
     path: Assets/Scenes/ClientScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/ServerScene.unity
+    guid: 54358b176ed2c4d9b93e7209c5602958
   m_configObjects: {}
