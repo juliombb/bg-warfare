@@ -40,10 +40,7 @@ namespace Server
                 writer.Put((byte)ServerCommand.ClientPeerId);
                 writer.Put(peer.Id);
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
-                foreach (var system in _handlers.Values)
-                {
-                    system.OnPeerEnter(peer);
-                }
+                StartCoroutine(TriggerPeerEnters(peer));
             };
 
             _listener.PeerDisconnectedEvent += (peer, info) =>
@@ -68,6 +65,15 @@ namespace Server
             Debug.Log("Started server");
 
             StartCoroutine(Polling());
+        }
+
+        private IEnumerator TriggerPeerEnters(NetPeer peer)
+        {
+            yield return new WaitForSeconds(0.5f);
+            foreach (var system in _handlers.Values)
+            {
+                system.OnPeerEnter(peer);
+            }
         }
 
         private IEnumerator Polling()

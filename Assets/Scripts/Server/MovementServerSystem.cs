@@ -64,6 +64,7 @@ namespace Server
 
         public void Poll()
         {
+            if (_playersToSend.Count == 0) return;
             _writer.Reset();
             _writer.Put((byte) ServerCommand.PositionOfPlayers);
             foreach (var playerToSend in _playersToSend)
