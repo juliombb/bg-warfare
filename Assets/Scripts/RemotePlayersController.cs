@@ -32,9 +32,9 @@ public class RemotePlayersController : MonoBehaviour
     {
         if (!_connectedPlayers.ContainsKey(userId)) return;
 
-        var playerObject = _connectedPlayers[userId];
+        var remotePlayer = _connectedPlayers[userId];
         _connectedPlayers.Remove(userId);
-        Destroy(playerObject);
+        Destroy(remotePlayer.gameObject);
     }
 
     public void OnPositionUpdate(int player, PlayerSnapshot snapshot)

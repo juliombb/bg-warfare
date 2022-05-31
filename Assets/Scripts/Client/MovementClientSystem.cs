@@ -27,13 +27,13 @@ namespace Client
             while (stream.HasNext())
             {
                 var player = stream.ReadInt32();
-                var snapshot = PlayerSnapshotSerializer.ReadPlayerSnapshot(stream);
+                var snapshot = stream.ReadPlayerSnapshot();
                 if (_clientPeerId == player)
                 {
                     continue;
                 }
                 _remotePlayersController.OnPositionUpdate(player, snapshot);
-                // Debug.Log($"Received remote player position ${snapshot.Position.ToString()}");
+                Debug.Log($"Received remote player position ${snapshot.Position.ToString()}");
             }
         }
         
