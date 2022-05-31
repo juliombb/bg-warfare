@@ -45,6 +45,14 @@ namespace Server
                     system.OnPeerEnter(peer);
                 }
             };
+
+            _listener.PeerDisconnectedEvent += (peer, info) =>
+            {
+                foreach (var system in _handlers.Values)
+                {
+                    system.OnPeerDisconnected(peer);
+                }
+            };
             
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {

@@ -82,6 +82,7 @@ namespace Server
         }
 
         public void OnPeerEnter(NetPeer peer) { }
+        public void OnPeerDisconnected(NetPeer peer) { }
 
         public void Poll() { }
     }

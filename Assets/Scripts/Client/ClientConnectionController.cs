@@ -86,6 +86,7 @@ namespace DefaultNamespace
             gameObject.GetOrAddComponent<ClientShotMonitor>().Setup(baseClient, server);
 
             AddSystem(new MovementClientSystem());
+            AddSystem(new PeerDisconnectClientSystem());
             AddSystem(new ShotClientSystem());
             foreach (var handlers in _handlers.Values)
             {

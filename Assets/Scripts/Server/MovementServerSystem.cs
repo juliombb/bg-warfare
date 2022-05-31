@@ -43,9 +43,18 @@ namespace Server
                 _writer.Put(BitConverter.GetBytes(playerToSend.Key));
                 _writer.PutPlayerSnapshot(playerToSend.Value);
             }
-            _playersToSend.Clear();
 
-            peer.Send(_writer, DeliveryMethod.ReliableUnordered);
+            peer.Send(_writer, DeliveryMethod.ReliableOrdered);
+        }
+
+        public void OnPeerDisconnected(NetPeer peer)
+        {
+            _lastKnownPositions.Remove(peer.Id);
+            _writer.Reset();
+            _writer.Put((byte) ServerCommand.OtherPlayerDisconnected);
+            _writer.Put(peer.Id);
+
+            peer.Send(_writer, DeliveryMethod.ReliableOrdered);
         }
 
         public void Poll()
