@@ -69,6 +69,7 @@ namespace Server
             _writer.Put((byte) ServerCommand.PositionOfPlayers);
             foreach (var playerToSend in _playersToSend)
             {
+                if (!_lastKnownPositions.ContainsKey(playerToSend)) continue;
                 var lastKnownPosition = _lastKnownPositions[playerToSend];
                 _writer.Put(BitConverter.GetBytes(playerToSend));
                 _writer.PutPlayerSnapshot(lastKnownPosition);

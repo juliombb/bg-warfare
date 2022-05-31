@@ -33,7 +33,6 @@ namespace Client
                     continue;
                 }
                 _remotePlayersController.OnPositionUpdate(player, snapshot);
-                Debug.Log($"Received remote player position ${snapshot.Position.ToString()}");
             }
         }
         
