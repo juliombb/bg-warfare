@@ -66,7 +66,7 @@ namespace Server
         private static ShotSnapshot CancelShot(Vector3 colliderPosition, Vector3 initialPlayerPosition, string reason)
         {
             Debug.Log($"Shot canceled!!! {reason}");
-            return new ShotSnapshot(-1, colliderPosition, initialPlayerPosition);
+            return new ShotSnapshot(-2, colliderPosition, initialPlayerPosition);
         }
 
         private void BroadcastShot(int shooter, ShotSnapshot shot)

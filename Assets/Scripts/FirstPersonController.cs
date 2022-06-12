@@ -89,6 +89,7 @@ public class FirstPersonController : MonoBehaviour
 
     public bool RenderCapsule(Vector3 position, int alt)
     {
+        return false;
         if (Vector3.Distance(position, _camera.ScreenPointToRay(Input.mousePosition).origin) < 1f)
         {
             return false;
@@ -122,6 +123,7 @@ public class FirstPersonController : MonoBehaviour
         if (obj == null)
         {
             obj = Instantiate(capsule, position, Quaternion.identity);
+            var name = "localPos";
 
             switch (alt)
             {
@@ -129,15 +131,19 @@ public class FirstPersonController : MonoBehaviour
                 {
                     var objRenderer = obj.GetComponentInChildren<MeshRenderer>();
                     objRenderer.material = altCapsuleMaterial;
+                    name = "rollbackPos";
                     break;
                 }
                 case 1:
                 {
                     var objRenderer = obj.GetComponentInChildren<MeshRenderer>();
                     objRenderer.material = altCapsuleMaterial2;
+                    name = "initialPos";
                     break;
                 }
             }
+
+            obj.name = name;
         }
         else
         {
