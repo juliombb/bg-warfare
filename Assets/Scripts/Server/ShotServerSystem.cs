@@ -16,11 +16,21 @@ namespace Server
         private readonly ServerController _serverController;
         private readonly RemotePlayersController _remotePlayersController;
         private readonly NetDataWriter _writer = new NetDataWriter();
+        private bool _compensateLag = true;
 
         public ShotServerSystem(ServerController serverController, GameObject baseGame)
         {
             _remotePlayersController = baseGame.GetComponentInChildren<RemotePlayersController>();
             _serverController = serverController;
+            string[] args = System.Environment.GetCommandLineArgs();
+            foreach (var arg in args)
+            {
+                if (arg == "-nocompensate")
+                {
+                    _compensateLag = false;
+                    Debug.Log("Lag compensation disabled");
+                }
+            }
         }
         public void Handle(int peer, byte[] data)
         {
@@ -39,6 +49,7 @@ namespace Server
             if (targetPlayer == null) return CancelShot(Vector3.zero, Vector3.zero, "target is null");
 
             var posOffset = targetPlayer.OffsetFrom(clientSequence);
+            if (!_compensateLag) posOffset = Vector3.zero;
             // offsetFrom = transform - rollback
             // rollback = transform - offsetFrom
             // forward(rollback) = transform = rollback + offsetFrom
