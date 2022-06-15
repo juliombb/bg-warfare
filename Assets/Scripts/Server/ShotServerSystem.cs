@@ -69,14 +69,14 @@ namespace Server
             if (remotePlayer.Id != shot.Target)
                 return CancelShot(rollbackPosition, initialPlayerPosition, "wrong player");
 
-            Debug.Log($"shot hit at {hit.point}!");
+            // Debug.Log($"shot hit at {hit.point}!");
             return new ShotSnapshot(shot.Target, rollbackPosition, initialPlayerPosition);
             // return new ShotSnapshot(shot.Target, hit.point, shot.Direction);
         }
 
         private static ShotSnapshot CancelShot(Vector3 colliderPosition, Vector3 initialPlayerPosition, string reason)
         {
-            Debug.Log($"Shot canceled!!! {reason}");
+            // Debug.Log($"Shot canceled!!! {reason}");
             return new ShotSnapshot(-2, colliderPosition, initialPlayerPosition);
         }
 

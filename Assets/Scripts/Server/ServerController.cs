@@ -91,7 +91,7 @@ namespace Server
 
         private void OnDestroy()
         {
-            Server.Stop();
+            Server?.Stop();
         }
     }
 }

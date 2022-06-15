@@ -69,7 +69,7 @@ public class FirstPersonController : MonoBehaviour
 
     public void TakeShot()
     {
-        Debug.Log("I was shot!");
+        // Debug.Log("I was shot!");
     }
 
     void FixedUpdate()

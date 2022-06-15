@@ -37,7 +37,7 @@ public class RemotePlayerController : MonoBehaviour
     {
         PlayerSnapshot lastSnapshot = null;
         PlayerSnapshot nextSnapshot = null;
-        Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
+        // Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
         var queue = _timedSnapshots;
         if (sequence == Sequence) return Vector3.zero;
         if (sequence == Sequence + 1 && _next != null)
@@ -60,7 +60,7 @@ public class RemotePlayerController : MonoBehaviour
                 break;
             }
         }
-        Debug.Log($"found snapshots: {lastSnapshot} -> {nextSnapshot}");
+        // Debug.Log($"found snapshots: {lastSnapshot} -> {nextSnapshot}");
 
         if (nextSnapshot == null && _previous != null)
         {
@@ -190,7 +190,7 @@ public class RemotePlayerController : MonoBehaviour
     
     public void Die(Vector3 hitPosition, Vector3 hitDirection)
     {
-        Debug.Log($"took shot at {hitPosition}");
+        // Debug.Log($"took shot at {hitPosition}");
         return;
         
         if (defaultModel == null)

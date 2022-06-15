@@ -13,6 +13,7 @@ public class EntrypointController : MonoBehaviour
             if (arg == "-server")
             {
                 SceneManager.LoadScene("ServerScene");
+                return;
             }
         }
 
