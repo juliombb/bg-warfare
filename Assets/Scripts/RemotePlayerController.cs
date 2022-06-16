@@ -37,7 +37,7 @@ public class RemotePlayerController : MonoBehaviour
     {
         PlayerSnapshot lastSnapshot = null;
         PlayerSnapshot nextSnapshot = null;
-        // Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
+        Debug.Log($"Trying to rollback to {sequence} (from {Sequence})");
         var queue = _timedSnapshots;
         if (sequence == Sequence) return Vector3.zero;
         if (sequence == Sequence + 1 && _next != null)
@@ -135,7 +135,7 @@ public class RemotePlayerController : MonoBehaviour
             _previous = _next;
             _next = _snapshotQueue.Dequeue();
             _lastInterpolation = time;
-            if (_timedSnapshots.Count > 8)
+            if (_timedSnapshots.Count > 2 / Config.TickRate)
             {
                 _timedSnapshots.Dequeue();
             }
