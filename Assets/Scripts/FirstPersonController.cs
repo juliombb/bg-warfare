@@ -89,7 +89,9 @@ public class FirstPersonController : MonoBehaviour
 
     public bool RenderCapsule(Vector3 position, int alt)
     {
+#if !UNITY_EDITOR
         return false;
+#endif
         if (Vector3.Distance(position, _camera.ScreenPointToRay(Input.mousePosition).origin) < 1f)
         {
             return false;
@@ -235,13 +237,16 @@ public class FirstPersonController : MonoBehaviour
         {
             var time = Time.time - _startOfRandomWalk;
             x = Mathf.Sin(time) * actualSpeed;
+            transform.position += new Vector3(x, 0);
         }
-
-        var position = transform.position;
-        var previousPosition = position;
-        position += cameraGo.transform.forward * z + cameraGo.transform.right * x;
-        position.y = previousPosition.y;
-        transform.position = position;
+        else
+        {
+            var position = transform.position;
+            var previousPosition = position;
+            position += cameraGo.transform.forward * z + cameraGo.transform.right * x;
+            position.y = previousPosition.y;
+            transform.position = position;
+        }
 
         animator.SetBool(Walking, Math.Abs(x) > 0.0001f || Math.Abs(z) > 0.0001f);
     }

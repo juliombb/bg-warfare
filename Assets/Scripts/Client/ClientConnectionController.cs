@@ -6,6 +6,7 @@ using Client;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Server;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,6 +24,7 @@ namespace DefaultNamespace
         private List<MonoBehaviour> _monitors;
 
         private Action _onDisconnect;
+        private TMP_Text _rtt;
 
         public void OnDisconnect(Action action)
         {
@@ -45,6 +47,7 @@ namespace DefaultNamespace
             _listener.PeerConnectedEvent += netPeer =>
             {
                 _server = netPeer;
+                _rtt = GameObject.Find("RTTText").GetComponent<TMP_Text>();
             };
             _listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
@@ -103,7 +106,12 @@ namespace DefaultNamespace
             while (_client.IsRunning)
             {
                 _client.PollEvents();
-                yield return new WaitForSeconds(1 / 15f);
+                if (_rtt != null && _server != null)
+                {
+                    _rtt.text = $"Ping: {_server.Ping}ms";
+                }
+
+                yield return new WaitForSeconds(Config.TickRate);
             }
         }
 
