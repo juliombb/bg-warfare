@@ -13,7 +13,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Material altCapsuleMaterial;
     [SerializeField] private Material altCapsuleMaterial2;
     private event Action<Vector3, Vector3, int, int> shotListener;
-    private float speed = 0.25f;
+    private float speed = 0.5f;
     private float ySense = 2f;
     private float xSense = 1.5f;
     private float jumpForce = 200f;
@@ -236,7 +236,7 @@ public class FirstPersonController : MonoBehaviour
         if (_randomWalk)
         {
             var time = Time.time - _startOfRandomWalk;
-            x = Mathf.Sin(time) * actualSpeed;
+            x = Mathf.Cos(time) * actualSpeed;
             transform.position += new Vector3(x, 0);
         }
         else
